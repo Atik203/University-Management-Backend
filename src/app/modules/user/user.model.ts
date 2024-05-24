@@ -20,8 +20,8 @@ export const userSchema = new Schema<TUser>(
     },
     status: {
       type: String,
-      enum: ['active', 'blocked'],
-      default: 'active',
+      enum: ['in-progress', 'blocked'],
+      default: 'in-progress',
     },
     isDeleted: {
       type: Boolean,
