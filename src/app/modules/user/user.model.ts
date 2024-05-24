@@ -5,20 +5,17 @@ export const userSchema = new Schema<TUser>(
   {
     id: {
       type: String,
-      required: true,
       unique: true,
     },
     password: {
       type: String,
-      required: true,
     },
     needsPasswordChange: {
       type: Boolean,
-      required: true,
+      default: true,
     },
     role: {
       type: String,
-      required: true,
       enum: ['admin', 'student', 'faculty'],
     },
     status: {
