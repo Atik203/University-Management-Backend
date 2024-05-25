@@ -1,9 +1,12 @@
-import { Request, Response } from 'express';
-import { z } from 'zod';
+import { NextFunction, Request, Response } from 'express';
 import studentValidationSchema from '../student/student.validation.zod';
 import { userService } from './user.service';
 
-const createStudent = async (req: Request, res: Response) => {
+const createStudent = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { password, student } = req.body;
 
@@ -26,18 +29,7 @@ const createStudent = async (req: Request, res: Response) => {
         .json({ success: false, message: 'Failed to create student' });
     }
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      res.status(400).json({
-        success: false,
-        message: error.errors.map((err) => err.message).join(', '),
-      });
-    } else if (error instanceof Error) {
-      res.status(500).json({ success: false, message: error.message });
-    } else {
-      res
-        .status(500)
-        .json({ success: false, message: 'Internal Server Error' });
-    }
+    next(error);
   }
 };
 

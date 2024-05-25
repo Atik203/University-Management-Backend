@@ -11,26 +11,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Student = void 0;
 const mongoose_1 = require("mongoose");
-const userSchema = new mongoose_1.Schema({
+const userNameSchema = new mongoose_1.Schema({
     firstName: {
         type: String,
-        trim: true,
         required: [true, 'First Name is required'],
-        maxlength: [20, 'First Name must not exceed 20 characters'],
-        validate: {
-            validator: function (value) {
-                const nameRegex = /^[a-zA-Z]+$/;
-                const str = value.charAt(0).toUpperCase() + value.slice(1);
-                return str === value && nameRegex.test(value);
-            },
-            message: '{VALUE} is not valid format',
-        },
+        trim: true,
+        maxlength: [20, 'Name can not be more than 20 characters'],
+    },
+    middleName: {
+        type: String,
+        trim: true,
     },
     lastName: {
         type: String,
         trim: true,
         required: [true, 'Last Name is required'],
-        maxlength: [20, 'Last Name must not exceed 20 characters'],
+        maxlength: [20, 'Name can not be more than 20 characters'],
     },
 });
 const guardianSchema = new mongoose_1.Schema({
@@ -38,84 +34,138 @@ const guardianSchema = new mongoose_1.Schema({
         type: String,
         trim: true,
         required: [true, 'Father Name is required'],
-        maxlength: [20, 'Father Name must not exceed 20 characters'],
+    },
+    fatherOccupation: {
+        type: String,
+        trim: true,
+        required: [true, 'Father occupation is required'],
+    },
+    fatherContactNo: {
+        type: String,
+        required: [true, 'Father Contact No is required'],
     },
     motherName: {
         type: String,
-        trim: true,
         required: [true, 'Mother Name is required'],
-        maxlength: [20, 'Mother Name must not exceed 20 characters'],
+    },
+    motherOccupation: {
+        type: String,
+        required: [true, 'Mother occupation is required'],
+    },
+    motherContactNo: {
+        type: String,
+        required: [true, 'Mother Contact No is required'],
+    },
+});
+const localGuardianSchema = new mongoose_1.Schema({
+    name: {
+        type: String,
+        required: [true, 'Name is required'],
+    },
+    occupation: {
+        type: String,
+        required: [true, 'Occupation is required'],
+    },
+    contactNo: {
+        type: String,
+        required: [true, 'Contact number is required'],
+    },
+    address: {
+        type: String,
+        required: [true, 'Address is required'],
     },
 });
 const studentSchema = new mongoose_1.Schema({
-    id: { type: String, unique: true, required: [true, 'ID is required'] },
+    id: {
+        type: String,
+        required: [true, 'ID is required'],
+        unique: true,
+    },
+    user: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        required: [true, 'User id is required'],
+        unique: true,
+        ref: 'User',
+    },
     name: {
-        type: userSchema,
+        type: userNameSchema,
         required: [true, 'Name is required'],
     },
     gender: {
         type: String,
         enum: {
-            values: ['male', 'female'],
-            message: 'Gender must be either male or female',
+            values: ['male', 'female', 'other'],
+            message: '{VALUE} is not a valid gender',
         },
         required: [true, 'Gender is required'],
     },
-    dateOfBirth: {
+    dateOfBirth: { type: String },
+    email: {
         type: String,
-        required: [true, 'Date of Birth is required'],
+        required: [true, 'Email is required'],
+        unique: true,
     },
-    address: { type: String, required: [true, 'Address is required'] },
-    phone: { type: String, required: [true, 'Phone number is required'] },
+    contactNo: { type: String, required: [true, 'Contact number is required'] },
+    emergencyContactNo: {
+        type: String,
+        required: [true, 'Emergency contact number is required'],
+    },
+    bloodGroup: {
+        type: String,
+        enum: {
+            values: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+            message: '{VALUE} is not a valid blood group',
+        },
+    },
+    presentAddress: {
+        type: String,
+        required: [true, 'Present address is required'],
+    },
+    permanentAddress: {
+        type: String,
+        required: [true, 'Permanent address is required'],
+    },
     guardian: {
         type: guardianSchema,
         required: [true, 'Guardian information is required'],
     },
-    profileImage: { type: String },
-    isActive: {
-        type: String,
-        enum: ['active', 'blocked'],
-        default: 'active',
-        required: [true, 'Status is required'],
+    localGuardian: {
+        type: localGuardianSchema,
+        required: [true, 'Local guardian information is required'],
     },
-    isDeleted: { type: Boolean, default: false },
+    profileImg: { type: String },
+    isDeleted: {
+        type: Boolean,
+        default: false,
+    },
 }, {
-    toJSON: { virtuals: true },
+    toJSON: {
+        virtuals: true,
+    },
+    timestamps: true,
 });
-// virtuals
+// virtual
 studentSchema.virtual('fullName').get(function () {
-    return `${this.name.firstName} ${this.name.lastName}`;
+    return this.name.firstName + this.name.middleName + this.name.lastName;
 });
+// Query Middleware
 studentSchema.pre('find', function (next) {
-    return __awaiter(this, void 0, void 0, function* () {
-        this.find({ isDeleted: { $ne: true } });
-        next();
-    });
+    this.find({ isDeleted: { $ne: true } });
+    next();
 });
 studentSchema.pre('findOne', function (next) {
-    return __awaiter(this, void 0, void 0, function* () {
-        this.find({ isDeleted: { $ne: true } });
-        next();
-    });
+    this.find({ isDeleted: { $ne: true } });
+    next();
 });
 studentSchema.pre('aggregate', function (next) {
-    return __awaiter(this, void 0, void 0, function* () {
-        this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
-        next();
-    });
+    this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
+    next();
 });
-// instance method
-/*
-studentSchema.methods.isUserExist = async function (id: string) {
-  return this.model('Student').findOne
-    ? this.model('Student').findOne({ id })
-    : null;
-};
-*/
-// static method
-studentSchema.statics.isUserExist = function (id) {
+//creating a custom static method
+studentSchema.statics.isUserExists = function (id) {
     return __awaiter(this, void 0, void 0, function* () {
-        return this.findOne ? this.findOne({ id }) : null;
+        const existingUser = yield exports.Student.findOne({ id });
+        return existingUser;
     });
 };
 exports.Student = (0, mongoose_1.model)('Student', studentSchema);

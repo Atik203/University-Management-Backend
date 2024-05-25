@@ -8,6 +8,7 @@ import tseslint from "typescript-eslint";
 export default [
 {
 files: ["src/**/*.ts", "src/**/*.tsx"],
+ignores: ["**/node_modules/**", "**/dist/**"],
 languageOptions: {
 globals: globals.node,
 ecmaVersion: "latest",
@@ -15,15 +16,13 @@ sourceType: "module",
 parser: tsParser,
 }
 },
-pluginJs.configs.recommended,
-...tseslint.configs.recommended,
 {
 plugins: {
 node,
 "@typescript-eslint": tsPlugin,
 },
 rules: {
-"no-unused-vars": "warn",
+"no-unused-vars": 'warn',
 "semi": ["error", "always"],
 "no-console": "warn",
  "no-unused-expressions": "warn",
@@ -31,5 +30,7 @@ rules: {
  "no-undef" : "error",
 },
 },
-prettierConfig
+pluginJs.configs.recommended,
+...tseslint.configs.recommended,
+prettierConfig,
 ];
