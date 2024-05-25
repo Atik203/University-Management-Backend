@@ -1,6 +1,6 @@
 import cors from 'cors';
-import express, { Application, NextFunction, Request, Response } from 'express';
-import { z } from 'zod';
+import express, { Application, Request, Response } from 'express';
+import { globalErrorHandler } from './app/middleware/globalErrorHandler';
 import { userRoute } from './app/modules/user/user.route';
 
 const app: Application = express();
@@ -25,17 +25,5 @@ app.use('*', (req: Request, res: Response) => {
 });
 
 // Error Handler
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
-  if (error instanceof z.ZodError) {
-    res.status(400).json({
-      success: false,
-      message: error.errors.map((err) => err.message).join(', '),
-    });
-  } else if (error instanceof Error) {
-    res.status(500).json({ success: false, message: error.message });
-  } else {
-    res.status(500).json({ success: false, message: 'Internal Server Error' });
-  }
-});
+app.use(globalErrorHandler);
 export default app;

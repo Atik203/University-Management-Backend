@@ -5,6 +5,7 @@ import prettierConfig from "eslint-config-prettier";
 import node from "eslint-plugin-node";
 import globals from "globals";
 import tseslint from "typescript-eslint";
+
 export default [
 {
 files: ["src/**/*.ts", "src/**/*.tsx"],
@@ -30,6 +31,7 @@ rules: {
  "no-undef" : "error",
 },
 },
+// extends
 pluginJs.configs.recommended,
 ...tseslint.configs.recommended,
 prettierConfig,
