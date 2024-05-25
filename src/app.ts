@@ -2,7 +2,7 @@ import cors from 'cors';
 import express, { Application, Request, Response } from 'express';
 import { globalErrorHandler } from './app/middleware/globalErrorHandler';
 import { routeNotFound } from './app/middleware/routeNotFound';
-import { userRoute } from './app/modules/user/user.route';
+import router from './app/routes';
 
 const app: Application = express();
 
@@ -11,7 +11,7 @@ app.use(cors());
 
 // Routes
 
-app.use('/api/v1/users', userRoute);
+app.use('/api/v1', router);
 
 app.get('/', async (req: Request, res: Response) => {
   res.send('Server is running...');
