@@ -1,4 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
+import httpStatus from 'http-status';
+import { sendResponse } from '../../utils/sendResponse';
 import studentValidationSchema from '../student/student.validation.zod';
 import { userService } from './user.service';
 
@@ -17,17 +19,12 @@ const createStudent = async (
       zodParseStudent,
     );
 
-    if (result) {
-      res.status(201).json({
-        success: true,
-        message: 'Student Created Successfully',
-        data: result,
-      });
-    } else {
-      res
-        .status(400)
-        .json({ success: false, message: 'Failed to create student' });
-    }
+    sendResponse(res, {
+      success: true,
+      message: 'Student created successfully',
+      statusCode: httpStatus.OK,
+      data: result,
+    });
   } catch (error) {
     next(error);
   }
