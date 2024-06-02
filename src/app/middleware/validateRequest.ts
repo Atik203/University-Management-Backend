@@ -1,21 +1,17 @@
 import { NextFunction, Request, Response } from 'express';
+import { AnyZodObject } from 'zod';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const validateRequest = (schema: any) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    const options = {
-      abortEarly: false, // include all errors
-      allowUnknown: true, // ignore unknown keys
-      stripUnknown: true, // remove unknown keys
-    };
-    const { error, value } = schema.validate(req.body, options);
-    if (error) {
-      next(
-        `Validation error: ${error.details.map((x) => x.message).join(', ')}`,
-      );
-    } else {
-      req.body = value;
+export const validateRequest = (schema: AnyZodObject) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // if error, it will throw an exception
+      await schema.parseAsync({
+        body: req.body,
+      });
+
       next();
+    } catch (error) {
+      next(error);
     }
   };
 };
