@@ -29,6 +29,17 @@ export const academicSemesterSchema = new Schema<TAcademicSemester>(
   },
 );
 
+// handle the duplicate semester in the same year
+
+academicSemesterSchema.pre('save', async function (next) {
+  const { name, year } = this as TAcademicSemester;
+  const semester = await AcademicSemester.findOne({ name, year });
+  if (semester) {
+    throw new Error('The semester already exists in the same year');
+  }
+  next();
+});
+
 export const AcademicSemester = model<TAcademicSemester>(
   'AcademicSemester',
   academicSemesterSchema,
