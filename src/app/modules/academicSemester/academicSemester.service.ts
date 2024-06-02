@@ -26,8 +26,23 @@ const getAcademicSemesterByIdFromDB = async (id: string) => {
   return result;
 };
 
+const updateAcademicSemesterFromDB = async (
+  id: string,
+  academicSemester: TAcademicSemester,
+) => {
+  const result = await AcademicSemester.findByIdAndUpdate(
+    id,
+    academicSemester,
+    {
+      new: true,
+    },
+  );
+  return result;
+};
+
 export const academicSemesterService = {
   createAcademicSemesterIntoDB,
   getAcademicSemesterFromDB,
   getAcademicSemesterByIdFromDB,
+  updateAcademicSemesterFromDB,
 };
