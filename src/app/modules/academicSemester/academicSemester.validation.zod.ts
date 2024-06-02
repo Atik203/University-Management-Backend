@@ -5,7 +5,7 @@ export const createAcademicSemesterSchema = z.object({
   body: z.object({
     name: z.enum([...Names] as [string, ...string[]]),
     code: z.enum([...Codes] as [string, ...string[]]),
-    year: z.date(),
+    year: z.string().min(4).max(4),
     startMonth: z.enum([...Months] as [string, ...string[]]),
     endMonth: z.enum([...Months] as [string, ...string[]]),
   }),
