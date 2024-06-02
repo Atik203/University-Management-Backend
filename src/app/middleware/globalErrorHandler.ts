@@ -12,7 +12,8 @@ export const globalErrorHandler = (
   if (error instanceof z.ZodError) {
     res.status(400).json({
       success: false,
-      message: error.errors.map((err) => err.message).join(', '),
+      // message: error.errors.map((err) => err.message).join(', '),
+      message: error,
     });
   } else if (error instanceof Error) {
     res.status(500).json({ success: false, message: error.message });
