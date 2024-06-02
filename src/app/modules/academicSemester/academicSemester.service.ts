@@ -30,6 +30,13 @@ const updateAcademicSemesterFromDB = async (
   id: string,
   academicSemester: TAcademicSemester,
 ) => {
+  if (
+    academicSemesterNameCodeMapper[academicSemester.name] !==
+    academicSemester.code
+  ) {
+    throw new Error('Invalid semester code');
+  }
+
   const result = await AcademicSemester.findByIdAndUpdate(
     id,
     academicSemester,

@@ -1,13 +1,13 @@
 import express from 'express';
 import { validateRequest } from '../../middleware/validateRequest';
 import { academicSemesterController } from './academicSemester.controller';
-import { createAcademicSemesterSchema } from './academicSemester.validation.zod';
+import { academicSemesterValidation } from './academicSemester.validation.zod';
 
 const router = express.Router();
 
 router.post(
   '/create-academic-semester',
-  validateRequest(createAcademicSemesterSchema),
+  validateRequest(academicSemesterValidation.createAcademicSemesterSchema),
   academicSemesterController.createAcademicSemester,
 );
 
@@ -15,6 +15,10 @@ router.get('/', academicSemesterController.getAcademicSemester);
 
 router.get('/:id', academicSemesterController.getAcademicSemesterById);
 
-router.patch('/:id', academicSemesterController.updateAcademicSemester);
+router.patch(
+  '/:id',
+  validateRequest(academicSemesterValidation.updateAcademicSemesterSchema),
+  academicSemesterController.updateAcademicSemester,
+);
 
 export const academicSemesterRoute = router;
