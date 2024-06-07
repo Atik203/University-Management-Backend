@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import config from '../../config';
 import AppError from '../../Errors/AppError';
 
@@ -15,23 +16,42 @@ const createStudentIntoDB = async (
     student.admissionSemester,
   );
 
-  if (!admissionSemester) {
-    throw new AppError(404, 'Admission semester not found');
-  }
+  const session = await mongoose.startSession();
 
-  const user: Partial<TUser> = {
-    password: password || (config.default_password as string),
-    role: 'student',
-    id: await generateStudentID(admissionSemester),
-  };
+  try {
+    session.startTransaction();
+    if (!admissionSemester) {
+      throw new AppError(404, 'Admission semester not found');
+    }
 
-  const newUser = await User.create(user);
+    const user: Partial<TUser> = {
+      password: password || (config.default_password as string),
+      role: 'student',
+      id: await generateStudentID(admissionSemester),
+    };
 
-  if (Object.keys(newUser).length) {
-    student.id = newUser.id;
-    student.user = newUser._id;
-    const newStudent: TStudent = await Student.create(student);
-    return newStudent;
+    // transaction 1
+    const newUser = await User.create([user], { session }); // array
+
+    if (!newUser.length) {
+      throw new AppError(500, 'Error creating user');
+    }
+
+    student.id = newUser[0].id;
+    student.user = newUser[0]._id;
+    const newStudent = await Student.create([student], { session });
+
+    if (!newStudent.length) {
+      throw new AppError(500, 'Error creating student');
+    }
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return newStudent[0];
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
   }
 };
 
