@@ -1,4 +1,5 @@
 import config from '../../config';
+import AppError from '../../Errors/AppError';
 
 import { AcademicSemester } from '../academicSemester/academicSemester.model';
 import { TStudent } from '../student/student.interface';
@@ -15,7 +16,7 @@ const createStudentIntoDB = async (
   );
 
   if (!admissionSemester) {
-    throw new Error('Admission semester not found');
+    throw new AppError(404, 'Admission semester not found');
   }
 
   const user: Partial<TUser> = {
