@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import config from '../../config';
 import AppError from '../../Errors/AppError';
 
+import httpStatus from 'http-status';
 import { AcademicSemester } from '../academicSemester/academicSemester.model';
 import { TStudent } from '../student/student.interface';
 import { Student } from '../student/student.model';
@@ -52,6 +53,7 @@ const createStudentIntoDB = async (
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
+    throw new AppError(httpStatus.BAD_REQUEST, 'Error creating student');
   }
 };
 
