@@ -41,6 +41,7 @@ export const createStudentValidationSchema = z.object({
       localGuardian: localGuardianSchema,
       profileImg: z.string().optional(),
       admissionSemester: z.string().min(1, 'Admission semester is required'),
+      academicDepartment: z.string().min(1, 'Academic department is required'),
     }),
   }),
 });

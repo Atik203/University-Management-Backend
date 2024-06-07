@@ -1,4 +1,5 @@
 import { model, Schema } from 'mongoose';
+import AppError from '../../Errors/AppError';
 import { Codes, Months, Names } from './academicSemester.constant';
 import { TAcademicSemester } from './academicSemester.interface';
 
@@ -35,7 +36,7 @@ academicSemesterSchema.pre('save', async function (next) {
   const { name, year } = this as TAcademicSemester;
   const semester = await AcademicSemester.findOne({ name, year });
   if (semester) {
-    throw new Error('The semester already exists in the same year');
+    throw new AppError(400, 'The semester already exists in the same year');
   }
   next();
 });

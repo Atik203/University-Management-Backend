@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { z } from 'zod';
+import AppError from '../Errors/AppError';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
@@ -15,8 +16,10 @@ export const globalErrorHandler = (
       // message: error.errors.map((err) => err.message).join(', '),
       message: error,
     });
-  } else if (error instanceof Error) {
-    res.status(500).json({ success: false, message: error.message });
+  } else if (error instanceof AppError) {
+    res
+      .status(error.statusCode || 500)
+      .json({ success: false, message: error.message });
   } else {
     res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
