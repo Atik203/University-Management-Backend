@@ -5,7 +5,7 @@ import { sendResponse } from '../../utils/sendResponse';
 import { StudentServices } from './student.service';
 
 const getSingleStudent = catchAsync(async (req, res) => {
-  const { studentId } = req.params;
+  const studentId = req.params.id;
   const result = await StudentServices.getSingleStudentFromDB(studentId);
 
   sendResponse(res, {
@@ -28,7 +28,7 @@ const getAllStudents: RequestHandler = catchAsync(async (req, res) => {
 });
 
 const deleteStudent = catchAsync(async (req, res) => {
-  const { studentId } = req.params;
+  const studentId = req.params.id;
   const result = await StudentServices.deleteStudentFromDB(studentId);
 
   sendResponse(res, {
