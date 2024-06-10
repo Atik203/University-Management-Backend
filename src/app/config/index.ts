@@ -8,4 +8,5 @@ export default {
   database_url: process.env.DATABASE_URL,
   bcrypt_salt: process.env.BCRYPT_SALT,
   default_password: process.env.DEFAULT_PASS,
+  NODE_ENV: process.env.NODE_ENV,
 };
