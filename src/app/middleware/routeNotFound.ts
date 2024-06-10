@@ -1,9 +1,14 @@
 import { Request, Response } from 'express';
-/* eslint-disable @typescript-eslint/no-unused-vars */
+import config from '../config';
 export const routeNotFound = (req: Request, res: Response) => {
   res.status(404).json({
     success: false,
     message: 'Route not found',
-    error: '',
+    errorSources: [
+      {
+        path: `${config.base_url}${req.originalUrl}`,
+        message: 'Route not found',
+      },
+    ],
   });
 };
