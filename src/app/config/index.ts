@@ -9,4 +9,5 @@ export default {
   bcrypt_salt: process.env.BCRYPT_SALT,
   default_password: process.env.DEFAULT_PASS,
   NODE_ENV: process.env.NODE_ENV,
+  base_url: process.env.BASE_URL,
 };
