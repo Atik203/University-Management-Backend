@@ -2,6 +2,7 @@ import { ErrorRequestHandler } from 'express';
 import mongoose from 'mongoose';
 import { ZodError } from 'zod';
 import config from '../config';
+import AppError from '../Errors/AppError';
 import handleCastError from '../Errors/handleCastError';
 import handleDuplicateError from '../Errors/handleDuplicateError';
 import handleValidationError from '../Errors/handleValidationError';
@@ -16,8 +17,8 @@ export const globalErrorHandler: ErrorRequestHandler = (
   res,
   next,
 ) => {
-  let statusCode = error.statusCode || 500;
-  let message = error.message || 'Internal Server Error';
+  let statusCode = 500;
+  let message = 'Internal Server Error';
   let errorSources: TErrorSources = [
     {
       path: '',
@@ -45,6 +46,23 @@ export const globalErrorHandler: ErrorRequestHandler = (
     statusCode = simplifiedError.statusCode;
     message = simplifiedError.message;
     errorSources = simplifiedError.errorSources;
+  } else if (error instanceof AppError) {
+    statusCode = error.statusCode;
+    message = error.message;
+    errorSources = [
+      {
+        path: '',
+        message,
+      },
+    ];
+  } else if (error instanceof Error) {
+    message = error.message;
+    errorSources = [
+      {
+        path: '',
+        message,
+      },
+    ];
   }
 
   res.status(statusCode).json({
