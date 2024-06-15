@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
 import mongoose from 'mongoose';
 import QueryBuilder from '../../builder/QueryBuilder';
@@ -78,10 +77,10 @@ const deleteAdminFromDB = async (id: string) => {
     await session.endSession();
 
     return deletedAdmin;
-  } catch (err: any) {
+  } catch (err) {
     await session.abortTransaction();
     await session.endSession();
-    throw new Error(err);
+    throw new AppError(httpStatus.BAD_REQUEST, (err as Error).message);
   }
 };
 
