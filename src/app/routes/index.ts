@@ -3,6 +3,7 @@ import { academicDepartmentRoutes } from '../modules/academicDepartment/academic
 import { academicFacultyRoutes } from '../modules/academicFaculty/academicFaculty.route';
 import { academicSemesterRoute } from '../modules/academicSemester/academicSemester.route';
 import { AdminRoutes } from '../modules/admin/admin.route';
+import { courseRoutes } from '../modules/course/course.route';
 import { FacultyRoutes } from '../modules/faculty/faculty.route';
 import { StudentRoutes } from '../modules/student/student.route';
 import { userRoute } from '../modules/user/user.route';
@@ -37,6 +38,10 @@ const moduleRoutes = [
   {
     path: '/faculties',
     route: FacultyRoutes,
+  },
+  {
+    path: '/courses',
+    route: courseRoutes,
   },
 ];
 
