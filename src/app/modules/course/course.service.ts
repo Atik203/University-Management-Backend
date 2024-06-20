@@ -33,11 +33,20 @@ const getSingleCourseFromDB = async (id: string) => {
 };
 
 const updateCourseIntoDB = async (id: string, data: Partial<TCourse>) => {
-  const result = await Course.findByIdAndUpdate(id, data, {
-    new: true,
-    runValidators: true,
-  });
-  return result;
+  const { preRequisiteCourses, ...remainingCourseData } = data;
+
+  // basic course info update
+
+  const updateBasicCourseInfo = await Course.findByIdAndUpdate(
+    id,
+    remainingCourseData,
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
+
+  return updateBasicCourseInfo;
 };
 
 const deleteCourseFromDB = async (id: string) => {
