@@ -53,6 +53,7 @@ const updateCourseIntoDB = async (id: string, data: Partial<TCourse>) => {
       .filter((element) => element.isDeleted && element.course)
       .map((element) => element.course);
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const deletedPreRequisiteCourses = await Course.findByIdAndUpdate(id, {
       $pull: {
         preRequisiteCourses: {
@@ -62,9 +63,26 @@ const updateCourseIntoDB = async (id: string, data: Partial<TCourse>) => {
         },
       },
     });
+
+    const newPreRequisiteCourses = preRequisiteCourses.filter(
+      (element) => !element.isDeleted && element.course,
+    );
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const updatedPreRequisiteCourses = await Course.findByIdAndUpdate(id, {
+      $addToSet: {
+        preRequisiteCourses: {
+          $each: newPreRequisiteCourses,
+        },
+      },
+    });
   }
 
-  return updateBasicCourseInfo;
+  const result = await Course.findById(id).populate(
+    'preRequisiteCourses.course',
+  );
+
+  return result;
 };
 
 const deleteCourseFromDB = async (id: string) => {
