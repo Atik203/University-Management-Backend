@@ -5,9 +5,6 @@ node_modules/
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
 
-# TypeScript cache
-*.tsbuildinfo
-
 # dotenv environment variable files
  .env
 .env.development.local
