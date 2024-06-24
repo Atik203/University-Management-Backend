@@ -1,4 +1,6 @@
+import httpStatus from 'http-status';
 import QueryBuilder from '../../builder/QueryBuilder';
+import AppError from '../../Errors/AppError';
 import { CourseSearchAbleFields } from './course.constant';
 import { TCourse } from './course.interface';
 import { Course } from './course.model';
@@ -35,54 +37,94 @@ const getSingleCourseFromDB = async (id: string) => {
 const updateCourseIntoDB = async (id: string, data: Partial<TCourse>) => {
   const { preRequisiteCourses, ...remainingCourseData } = data;
 
-  // basic course info update
+  const session = await Course.startSession();
 
-  const updateBasicCourseInfo = await Course.findByIdAndUpdate(
-    id,
-    remainingCourseData,
-    {
-      new: true,
-      runValidators: true,
-    },
-  );
+  try {
+    session.startTransaction();
 
-  // pre requisite courses update
+    // basic course info update
 
-  if (preRequisiteCourses && preRequisiteCourses.length > 0) {
-    const deletedPreRequisiteCoursesID = preRequisiteCourses
-      .filter((element) => element.isDeleted && element.course)
-      .map((element) => element.course);
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const deletedPreRequisiteCourses = await Course.findByIdAndUpdate(id, {
-      $pull: {
-        preRequisiteCourses: {
-          course: {
-            $in: deletedPreRequisiteCoursesID,
-          },
-        },
+    const updateBasicCourseInfo = await Course.findByIdAndUpdate(
+      id,
+      remainingCourseData,
+      {
+        new: true,
+        runValidators: true,
+        session,
       },
-    });
-
-    const newPreRequisiteCourses = preRequisiteCourses.filter(
-      (element) => !element.isDeleted && element.course,
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const updatedPreRequisiteCourses = await Course.findByIdAndUpdate(id, {
-      $addToSet: {
-        preRequisiteCourses: {
-          $each: newPreRequisiteCourses,
+    if (!updateBasicCourseInfo) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Course not found');
+    }
+
+    // pre requisite courses update
+
+    if (preRequisiteCourses && preRequisiteCourses.length > 0) {
+      const deletedPreRequisiteCoursesID = preRequisiteCourses
+        .filter((element) => element.isDeleted && element.course)
+        .map((element) => element.course);
+
+      const deletedPreRequisiteCourses = await Course.findByIdAndUpdate(
+        id,
+        {
+          $pull: {
+            preRequisiteCourses: {
+              course: {
+                $in: deletedPreRequisiteCoursesID,
+              },
+            },
+          },
         },
-      },
-    });
+        { session, new: true, runValidators: true },
+      );
+
+      if (!deletedPreRequisiteCourses) {
+        throw new AppError(
+          httpStatus.NOT_FOUND,
+          'Pre requisite course not found',
+        );
+      }
+
+      const newPreRequisiteCourses = preRequisiteCourses.filter(
+        (element) => !element.isDeleted && element.course,
+      );
+
+      const updatedPreRequisiteCourses = await Course.findByIdAndUpdate(
+        id,
+        {
+          $addToSet: {
+            preRequisiteCourses: {
+              $each: newPreRequisiteCourses,
+            },
+          },
+        },
+        {
+          session,
+          new: true,
+          runValidators: true,
+        },
+      );
+
+      if (!updatedPreRequisiteCourses) {
+        throw new AppError(
+          httpStatus.NOT_FOUND,
+          'Pre requisite course not found',
+        );
+      }
+    }
+    session.commitTransaction();
+    session.endSession();
+    const result = await Course.findById(id).populate(
+      'preRequisiteCourses.course',
+    );
+
+    return result;
+  } catch (error) {
+    session.abortTransaction();
+    session.endSession();
+    throw new AppError(httpStatus.BAD_REQUEST, (error as Error)?.message);
   }
-
-  const result = await Course.findById(id).populate(
-    'preRequisiteCourses.course',
-  );
-
-  return result;
 };
 
 const deleteCourseFromDB = async (id: string) => {
