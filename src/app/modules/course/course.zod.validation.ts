@@ -31,3 +31,9 @@ export const updateCourseValidationSchema = z.object({
       .optional(),
   }),
 });
+
+export const assignFacultiesValidationSchema = z.object({
+  body: z.object({
+    faculties: z.array(z.string().min(1)),
+  }),
+});
