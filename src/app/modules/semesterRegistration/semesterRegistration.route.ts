@@ -1,7 +1,10 @@
 import express from 'express';
 import { validateRequest } from '../../middleware/validateRequest';
 import { semesterRegistrationController } from './semesterRegistration.controller';
-import { createSemesterRegistrationSchema } from './semesterRegistration.zod.validation';
+import {
+  createSemesterRegistrationSchema,
+  updateSemesterRegistrationSchema,
+} from './semesterRegistration.zod.validation';
 
 const router = express.Router();
 
@@ -11,14 +14,19 @@ router.post(
   semesterRegistrationController.createSemesterRegistration,
 );
 
-router.get('/:id');
+router.get(
+  '/:id',
+  semesterRegistrationController.getSingleSemesterRegistration,
+);
 
-router.patch('/:id');
-
-router.get('/:id');
+router.patch(
+  '/:id',
+  validateRequest(updateSemesterRegistrationSchema),
+  semesterRegistrationController.updateSemesterRegistration,
+);
 
 router.delete('/:id');
 
-router.get('/');
+router.get('/', semesterRegistrationController.getAllSemesterRegistration);
 
 export const semesterRegistrationRoutes = router;
