@@ -2,6 +2,7 @@ import httpStatus from 'http-status';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../Errors/AppError';
 import { AcademicSemester } from '../academicSemester/academicSemester.model';
+import { RegistrationStatus } from './semesterRegistration.constant';
 import { TSemesterRegistration } from './semesterRegistration.interface';
 import { SemesterRegistration } from './semesterRegistration.model';
 
@@ -11,7 +12,10 @@ const createSemesterRegistrationIntoDB = async (
   // check if there any registered semester ONGOING or UPCOMING
 
   const isOngoingOrUpcomingSemester = await SemesterRegistration.findOne({
-    $or: [{ status: 'ONGOING' }, { status: 'UPCOMING' }],
+    $or: [
+      { status: RegistrationStatus.ONGOING },
+      { status: RegistrationStatus.UPCOMING },
+    ],
   });
 
   if (isOngoingOrUpcomingSemester) {
@@ -84,15 +88,40 @@ const updateSemesterRegistrationIntoDB = async (
 
   // check if requested semester registration ENDED
   const currentSemesterStatus = isAcademicSemesterExist?.status;
-  if (currentSemesterStatus === 'ENDED') {
+  if (currentSemesterStatus === RegistrationStatus.ENDED) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
       'Semester Registration has already ENDED',
     );
   }
 
+  // UPCOMING --> ONGOING --> ENDED
+
+  const requestedSemesterStatus = payload?.status;
+
+  if (
+    currentSemesterStatus === RegistrationStatus.UPCOMING &&
+    requestedSemesterStatus === RegistrationStatus.ENDED
+  ) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Can not change UPCOMING semester to ENDED directly',
+    );
+  }
+
+  if (
+    currentSemesterStatus === RegistrationStatus.ONGOING &&
+    requestedSemesterStatus === RegistrationStatus.UPCOMING
+  ) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Can not change ONGOING semester to UPCOMING',
+    );
+  }
+
   const result = SemesterRegistration.findByIdAndUpdate(id, payload, {
     new: true,
+    runValidators: true,
   });
   return result;
 };
