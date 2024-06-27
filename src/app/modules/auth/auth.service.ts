@@ -1,10 +1,11 @@
 import bcrypt from 'bcrypt';
 import httpStatus from 'http-status';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import { JwtPayload } from 'jsonwebtoken';
 import config from '../../config';
 import AppError from '../../Errors/AppError';
 import { User } from '../user/user.model';
 import { TLoginUser } from './auth.interface';
+import { createToken } from './auth.utils';
 const loginUserService = async (payload: TLoginUser) => {
   // Check if the user exists in the database
   if (!(await User.isUserExistByCustomId(payload.id))) {
@@ -34,17 +35,22 @@ const loginUserService = async (payload: TLoginUser) => {
     role: user.role,
   };
 
-  const access_token = jwt.sign(
+  const accessToken = createToken(
     jwtPayload,
     config.jwt_access_secret as string,
-    {
-      expiresIn: '10d',
-    },
+    config.jwt_access_expiration as string,
+  );
+
+  const refreshToken = createToken(
+    jwtPayload,
+    config.jwt_refresh_secret as string,
+    config.jwt_refresh_expiration as string,
   );
 
   return {
-    access_token,
+    accessToken,
     needsPasswordChange: user?.needsPasswordChange,
+    refreshToken,
   };
 };
 
