@@ -224,29 +224,55 @@ const deleteOfferedCourseFromDB = async (id: string) => {
    * Step 2: check if the semester registration status is upcoming
    * Step 3: delete the offered course
    */
-  const isOfferedCourseExists = await OfferedCourse.findById(id);
 
-  if (!isOfferedCourseExists) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Offered Course not found');
+  const session = await OfferedCourse.startSession();
+
+  try {
+    session.startTransaction();
+    const isOfferedCourseExists = await OfferedCourse.findById(id);
+
+    if (!isOfferedCourseExists) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Offered Course not found');
+    }
+
+    const semesterRegistration = isOfferedCourseExists.semesterRegistration;
+
+    const semesterRegistrationStatus =
+      await SemesterRegistration.findById(semesterRegistration).select(
+        'status',
+      );
+
+    if (semesterRegistrationStatus?.status !== 'UPCOMING') {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        `Offered course can not update ! because the semester ${semesterRegistrationStatus}`,
+      );
+    }
+
+    const result = await OfferedCourse.findByIdAndDelete(id);
+
+    // delete the semester registration if the offered course is deleted
+
+    const deleteSemesterRegistration =
+      await SemesterRegistration.findByIdAndDelete(semesterRegistration);
+
+    if (!deleteSemesterRegistration) {
+      throw new AppError(
+        httpStatus.NOT_FOUND,
+        "Can not delete the offered course and it's semester registration",
+      );
+    }
+
+    await session.commitTransaction();
+    await session.endSession();
+
+    return result;
+  } catch (err) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new AppError(httpStatus.BAD_REQUEST, (err as Error).message);
   }
-
-  const semesterRegistration = isOfferedCourseExists.semesterRegistration;
-
-  const semesterRegistrationStatus =
-    await SemesterRegistration.findById(semesterRegistration).select('status');
-
-  if (semesterRegistrationStatus?.status !== 'UPCOMING') {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      `Offered course can not update ! because the semester ${semesterRegistrationStatus}`,
-    );
-  }
-
-  const result = await OfferedCourse.findByIdAndDelete(id);
-
-  return result;
 };
-
 export const OfferedCourseServices = {
   createOfferedCourseIntoDB,
   getAllOfferedCoursesFromDB,
