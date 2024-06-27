@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import httpStatus from 'http-status';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../../config';
 import AppError from '../../Errors/AppError';
 import { User } from '../user/user.model';
