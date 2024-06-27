@@ -2,6 +2,7 @@ import express from 'express';
 
 import { auth } from '../../middleware/auth';
 import { validateRequest } from '../../middleware/validateRequest';
+import { USER_ROLE } from '../user/user.constant';
 import { FacultyControllers } from './faculty.controller';
 import { updateFacultyValidationSchema } from './faculty.validation.zod';
 
@@ -15,8 +16,8 @@ router.patch(
   FacultyControllers.updateFaculty,
 );
 
-router.delete('/:id', FacultyControllers.deleteFaculty);
+router.delete('/:id', auth(USER_ROLE.admin), FacultyControllers.deleteFaculty);
 
-router.get('/', auth(), FacultyControllers.getAllFaculties);
+router.get('/', auth(USER_ROLE.admin), FacultyControllers.getAllFaculties);
 
 export const FacultyRoutes = router;
