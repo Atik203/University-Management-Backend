@@ -87,4 +87,11 @@ userSchema.statics.isUserPasswordMatched = async function (
   return user;
 };
 
+userSchema.statics.isJWTIssuedBeforePasswordChange = async function (
+  passwordChangeTimeStamp: Date,
+  jwtIssuedTimeStamp: number,
+) {
+  return passwordChangeTimeStamp.getTime() / 1000 > jwtIssuedTimeStamp;
+};
+
 export const User = model<TUser, UserModel>('User', userSchema);
