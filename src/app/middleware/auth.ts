@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 
 import httpStatus from 'http-status';
+import jwt, { JwtPayload } from 'jsonwebtoken';
+import config from '../config';
 import AppError from '../Errors/AppError';
 import { catchAsync } from '../utils/catchAsync';
 
@@ -14,6 +16,18 @@ export const auth = () => {
       throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized');
     }
 
-    next();
+    // verify token
+    jwt.verify(
+      token,
+      config.jwt_access_secret as string,
+      function (err, decoded) {
+        if (err) {
+          throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized');
+        }
+        req.user = decoded as JwtPayload;
+
+        next();
+      },
+    );
   });
 };
