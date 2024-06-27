@@ -7,6 +7,7 @@ export const validateRequest = (schema: AnyZodObject) => {
     // if error, it will throw an exception
     await schema.parseAsync({
       body: req.body,
+      cookies: req.cookies,
     });
 
     next();

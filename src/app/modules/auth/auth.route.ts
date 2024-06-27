@@ -6,6 +6,7 @@ import { authController } from './auth.controller';
 import {
   changePasswordValidationSchema,
   loginValidationSchema,
+  refreshTokenValidationSchema,
 } from './auth.zod.validation';
 
 const router = express.Router();
@@ -21,6 +22,12 @@ router.post(
   auth(USER_ROLE.admin, USER_ROLE.faculty, USER_ROLE.student),
   validateRequest(changePasswordValidationSchema),
   authController.changePassword,
+);
+
+router.post(
+  '/refresh-token',
+  validateRequest(refreshTokenValidationSchema),
+  authController.refreshToken,
 );
 
 export const authRoutes = router;

@@ -49,3 +49,11 @@ export const changePasswordValidationSchema = z.object({
       }),
   }),
 });
+
+export const refreshTokenValidationSchema = z.object({
+  cookies: z.object({
+    refreshToken: z.string({
+      required_error: 'refreshToken is required',
+    }),
+  }),
+});
