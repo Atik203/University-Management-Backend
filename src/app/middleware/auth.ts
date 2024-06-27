@@ -18,24 +18,19 @@ export const auth = (...requiredRoles: TUserRole[]) => {
     }
 
     // verify token
-    jwt.verify(
+    const decoded = jwt.verify(
       token,
       config.jwt_access_secret as string,
-      function (err, decoded) {
-        if (err) {
-          throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized');
-        }
+    ) as JwtPayload;
 
-        const role = (decoded as JwtPayload)?.role as TUserRole;
+    const role = decoded?.role;
 
-        if (requiredRoles && !requiredRoles.includes(role)) {
-          throw new AppError(httpStatus.FORBIDDEN, 'You are not authorized');
-        }
+    if (requiredRoles && !requiredRoles.includes(role)) {
+      throw new AppError(httpStatus.FORBIDDEN, 'You are not authorized');
+    }
 
-        req.user = decoded as JwtPayload;
+    req.user = decoded;
 
-        next();
-      },
-    );
+    next();
   });
 };
