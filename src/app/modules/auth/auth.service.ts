@@ -1,8 +1,9 @@
 import httpStatus from 'http-status';
+import jwt from 'jsonwebtoken';
+import config from '../../config';
 import AppError from '../../Errors/AppError';
 import { User } from '../user/user.model';
 import { TLoginUser } from './auth.interface';
-
 const loginUserService = async (payload: TLoginUser) => {
   // Check if the user exists in the database
   if (!(await User.isUserExistByCustomId(payload.id))) {
@@ -22,13 +23,28 @@ const loginUserService = async (payload: TLoginUser) => {
   }
 
   // Check if the password is correct
-  if ((await User.isPassWordMatched(payload.id, payload.password)) === false) {
-    throw new AppError(httpStatus.UNAUTHORIZED, 'Incorrect password');
-  }
 
-  const user = await User.findOne({ id: payload.id });
+  const user = await User.isUserPasswordMatched(payload.id, payload.password);
 
-  return user;
+  // create jwt token
+
+  const jwtPayload = {
+    id: user.id,
+    role: user.role,
+  };
+
+  const access_token = jwt.sign(
+    jwtPayload,
+    config.jwt_access_secret as string,
+    {
+      expiresIn: '10d',
+    },
+  );
+
+  return {
+    access_token,
+    needsPasswordChange: user?.needsPasswordChange,
+  };
 };
 
 export const authService = {
