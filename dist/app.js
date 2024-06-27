@@ -12,38 +12,26 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const cors_1 = __importDefault(require("cors"));
 const express_1 = __importDefault(require("express"));
-const zod_1 = require("zod");
-const user_route_1 = require("./app/modules/user/user.route");
+const globalErrorHandler_1 = require("./app/middleware/globalErrorHandler");
+const routeNotFound_1 = require("./app/middleware/routeNotFound");
+const routes_1 = __importDefault(require("./app/routes"));
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
-app.use((0, cors_1.default)());
+app.use((0, cookie_parser_1.default)());
+app.use((0, cors_1.default)({
+    origin: ['http://localhost:5173'],
+    credentials: true, // allow cookies from the client
+}));
 // Routes
-app.use('/api/v1/users', user_route_1.userRoute);
+app.use('/api/v1', routes_1.default);
 app.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.send('Server is running...');
 }));
 // 404 Route
-app.use('*', (req, res) => {
-    res.status(404).json({
-        success: false,
-        message: 'Route not found',
-    });
-});
+app.use('*', routeNotFound_1.routeNotFound);
 // Error Handler
-app.use((error, req, res, next) => {
-    if (error instanceof zod_1.z.ZodError) {
-        res.status(400).json({
-            success: false,
-            message: error.errors.map((err) => err.message).join(', '),
-        });
-    }
-    else if (error instanceof Error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-    else {
-        res.status(500).json({ success: false, message: 'Internal Server Error' });
-    }
-});
+app.use(globalErrorHandler_1.globalErrorHandler);
 exports.default = app;

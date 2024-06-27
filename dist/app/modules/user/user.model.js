@@ -14,8 +14,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = exports.userSchema = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const http_status_1 = __importDefault(require("http-status"));
 const mongoose_1 = require("mongoose");
 const config_1 = __importDefault(require("../../config"));
+const AppError_1 = __importDefault(require("../../Errors/AppError"));
 exports.userSchema = new mongoose_1.Schema({
     id: {
         type: String,
@@ -23,10 +25,14 @@ exports.userSchema = new mongoose_1.Schema({
     },
     password: {
         type: String,
+        select: 0,
     },
     needsPasswordChange: {
         type: Boolean,
         default: true,
+    },
+    passwordChangedAt: {
+        type: Date,
     },
     role: {
         type: String,
@@ -55,4 +61,40 @@ exports.userSchema.post('save', function (doc, next) {
     doc.password = '';
     next();
 });
+exports.userSchema.statics.isUserExistByCustomId = function (id) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const user = yield this.findOne({ id });
+        return !!user; // !!user === user ? true : false
+    });
+};
+exports.userSchema.statics.isUserDeleted = function (id) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const user = yield this.findOne({ id });
+        return user === null || user === void 0 ? void 0 : user.isDeleted;
+    });
+};
+exports.userSchema.statics.isUserBlocked = function (id) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const user = yield this.findOne({ id });
+        return (user === null || user === void 0 ? void 0 : user.status) === 'blocked';
+    });
+};
+exports.userSchema.statics.isUserPasswordMatched = function (id, password) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const user = yield this.findOne({ id }).select('+password');
+        if (!user) {
+            throw new AppError_1.default(http_status_1.default.NOT_FOUND, 'User not found');
+        }
+        const isPasswordMatched = bcrypt_1.default.compareSync(password, user.password);
+        if (!isPasswordMatched) {
+            throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, 'Incorrect password');
+        }
+        return user;
+    });
+};
+exports.userSchema.statics.isJWTIssuedBeforePasswordChange = function (passwordChangeTimeStamp, jwtIssuedTimeStamp) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return passwordChangeTimeStamp.getTime() / 1000 > jwtIssuedTimeStamp;
+    });
+};
 exports.User = (0, mongoose_1.model)('User', exports.userSchema);
