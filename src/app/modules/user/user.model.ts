@@ -13,10 +13,14 @@ export const userSchema = new Schema<TUser, UserModel>(
     },
     password: {
       type: String,
+      select: 0,
     },
     needsPasswordChange: {
       type: Boolean,
       default: true,
+    },
+    passwordChangedAt: {
+      type: Date,
     },
     role: {
       type: String,
@@ -70,7 +74,7 @@ userSchema.statics.isUserPasswordMatched = async function (
   id: string,
   password: string,
 ) {
-  const user = await this.findOne({ id });
+  const user = await this.findOne({ id }).select('+password');
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
   }
