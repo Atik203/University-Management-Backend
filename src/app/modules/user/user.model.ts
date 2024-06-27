@@ -1,6 +1,8 @@
 import bcrypt from 'bcrypt';
+import httpStatus from 'http-status';
 import { model, Schema } from 'mongoose';
 import config from '../../config';
+import AppError from '../../Errors/AppError';
 import { TUser, UserModel } from './user.interface';
 
 export const userSchema = new Schema<TUser, UserModel>(
@@ -64,12 +66,21 @@ userSchema.statics.isUserBlocked = async function (id: string) {
   return user?.status === 'blocked';
 };
 
-userSchema.statics.isPasswordMatched = async function (
+userSchema.statics.isUserPasswordMatched = async function (
   id: string,
   password: string,
 ) {
   const user = await this.findOne({ id });
-  return bcrypt.compareSync(password, user?.password || '');
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  const isPasswordMatched = bcrypt.compareSync(password, user.password);
+
+  if (!isPasswordMatched) {
+    throw new AppError(httpStatus.UNAUTHORIZED, 'Incorrect password');
+  }
+
+  return user;
 };
 
 export const User = model<TUser, UserModel>('User', userSchema);

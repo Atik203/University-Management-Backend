@@ -13,5 +13,5 @@ export interface UserModel extends Model<TUser> {
   isUserExistByCustomId: (id: string) => Promise<boolean>;
   isUserDeleted: (id: string) => Promise<boolean>;
   isUserBlocked: (id: string) => Promise<boolean>;
-  isPassWordMatched: (id: string, password: string) => Promise<boolean>;
+  isUserPasswordMatched: (id: string, password: string) => Promise<TUser>;
 }
