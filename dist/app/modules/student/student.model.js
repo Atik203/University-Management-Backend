@@ -134,9 +134,17 @@ const studentSchema = new mongoose_1.Schema({
         required: [true, 'Local guardian information is required'],
     },
     profileImg: { type: String },
+    admissionSemester: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: 'AcademicSemester',
+    },
     isDeleted: {
         type: Boolean,
         default: false,
+    },
+    academicDepartment: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: 'AcademicDepartment',
     },
 }, {
     toJSON: {
@@ -146,7 +154,12 @@ const studentSchema = new mongoose_1.Schema({
 });
 // virtual
 studentSchema.virtual('fullName').get(function () {
-    return this.name.firstName + this.name.middleName + this.name.lastName;
+    var _a, _b, _c;
+    return (((_a = this === null || this === void 0 ? void 0 : this.name) === null || _a === void 0 ? void 0 : _a.firstName) +
+        ' ' +
+        ((_b = this === null || this === void 0 ? void 0 : this.name) === null || _b === void 0 ? void 0 : _b.middleName) +
+        ' ' +
+        ((_c = this === null || this === void 0 ? void 0 : this.name) === null || _c === void 0 ? void 0 : _c.lastName));
 });
 // Query Middleware
 studentSchema.pre('find', function (next) {
@@ -162,7 +175,7 @@ studentSchema.pre('aggregate', function (next) {
     next();
 });
 //creating a custom static method
-studentSchema.statics.isUserExists = function (id) {
+studentSchema.statics.isStudentExists = function (id) {
     return __awaiter(this, void 0, void 0, function* () {
         const existingUser = yield exports.Student.findOne({ id });
         return existingUser;
