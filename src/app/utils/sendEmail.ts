@@ -7,15 +7,15 @@ export const sendEmail = async (to: string, html: string) => {
     port: 587,
     secure: config.NODE_ENV === 'production', // Use `true` for port 465, `false` for all other ports
     auth: {
-      user: 'atikurrahaman0304@gmail.com',
-      pass: 'wkkj zxtq ijja zsxz',
+      user: config.nodemailer_auth_user_email,
+      pass: config.nodemailer_auth_user_password,
     },
   });
 
   await transporter.sendMail({
-    from: 'atikurrahaman0304@gmail.com', // sender address
+    from: config.nodemailer_auth_user_email, // sender address
     to,
-    subject: 'Change Password', // Subject line
+    subject: 'Reset Your Password Within 1hours', // Subject line
     text: 'Reset Your Password Within 1hours', // plain text body
     html,
   });
