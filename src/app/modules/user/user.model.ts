@@ -11,6 +11,11 @@ export const userSchema = new Schema<TUser, UserModel>(
       type: String,
       unique: true,
     },
+    email: {
+      type: String,
+      unique: true,
+      trim: true,
+    },
     password: {
       type: String,
       select: 0,
