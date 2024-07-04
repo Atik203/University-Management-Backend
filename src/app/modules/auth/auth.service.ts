@@ -3,6 +3,7 @@ import httpStatus from 'http-status';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../../config';
 import AppError from '../../Errors/AppError';
+import { TUser } from '../user/user.interface';
 import { User } from '../user/user.model';
 import { TLoginUser } from './auth.interface';
 import { createToken } from './auth.utils';
@@ -176,8 +177,45 @@ const refreshTokenService = async (token: string) => {
   };
 };
 
+const forgotPasswordService = async (payload: { id: string }) => {
+  // Check if the user exists in the database
+  if (!(await User.isUserExistByCustomId(payload.id))) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
+
+  // check if user is deleted
+
+  if (await User.isUserDeleted(payload.id)) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'User is deleted');
+  }
+
+  // check if user is blocked
+
+  if (await User.isUserBlocked(payload.id)) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'User is blocked');
+  }
+
+  const user = (await User.findOne({ id: payload.id })) as TUser;
+
+  const jwtPayload = {
+    id: user.id,
+    role: user.role,
+  };
+
+  const accessToken = createToken(
+    jwtPayload,
+    config.jwt_access_secret as string,
+    '1h',
+  );
+
+  const resetLink = `http://localhost:5173?id=${user.id}&token=${accessToken}`;
+
+  return resetLink;
+};
+
 export const authService = {
   loginUserService,
   changePasswordService,
   refreshTokenService,
+  forgotPasswordService,
 };
