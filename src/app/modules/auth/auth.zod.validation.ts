@@ -57,3 +57,11 @@ export const refreshTokenValidationSchema = z.object({
     }),
   }),
 });
+
+export const forgotPasswordValidationSchema = z.object({
+  body: z.object({
+    id: z.string({
+      required_error: 'id is required',
+    }),
+  }),
+});

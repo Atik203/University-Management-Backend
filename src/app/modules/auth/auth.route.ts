@@ -5,6 +5,7 @@ import { USER_ROLE } from '../user/user.constant';
 import { authController } from './auth.controller';
 import {
   changePasswordValidationSchema,
+  forgotPasswordValidationSchema,
   loginValidationSchema,
   refreshTokenValidationSchema,
 } from './auth.zod.validation';
@@ -28,6 +29,12 @@ router.post(
   '/refresh-token',
   validateRequest(refreshTokenValidationSchema),
   authController.refreshToken,
+);
+
+router.post(
+  '/forgot-password',
+  validateRequest(forgotPasswordValidationSchema),
+  authController.forgotPassword,
 );
 
 export const authRoutes = router;
