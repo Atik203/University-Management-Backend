@@ -3,6 +3,7 @@ import httpStatus from 'http-status';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../../config';
 import AppError from '../../Errors/AppError';
+import { sendEmail } from '../../utils/sendEmail';
 import { TUser } from '../user/user.interface';
 import { User } from '../user/user.model';
 import { TLoginUser } from './auth.interface';
@@ -202,13 +203,15 @@ const forgotPasswordService = async (payload: { id: string }) => {
     role: user.role,
   };
 
-  const accessToken = createToken(
+  const resetToken = createToken(
     jwtPayload,
     config.jwt_access_secret as string,
     '1h',
   );
 
-  const resetLink = `http://localhost:5173?id=${user.id}&token=${accessToken}`;
+  const resetLink = `${config.reset_password_url}?id=${user.id}&token=${resetToken}`;
+
+  sendEmail(user.email, resetLink);
 
   return resetLink;
 };
