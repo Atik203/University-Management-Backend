@@ -216,9 +216,86 @@ const forgotPasswordService = async (payload: { id: string }) => {
   return resetLink;
 };
 
+const resetPasswordService = async (
+  payload: { id: string; newPassword: string },
+  token: string,
+) => {
+  // Check if the user exists in the database
+
+  const { id, newPassword } = payload;
+
+  if (!(await User.isUserExistByCustomId(id))) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
+
+  // check if user is deleted
+
+  if (await User.isUserDeleted(id)) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'User is deleted');
+  }
+
+  // check if user is blocked
+
+  if (await User.isUserBlocked(id)) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'User is blocked');
+  }
+
+  // verify token
+  const decoded = jwt.verify(
+    token,
+    config.jwt_access_secret as string,
+  ) as JwtPayload;
+
+  if (decoded.id !== id) {
+    throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid token');
+  }
+
+  // check if the password was changed after the token was issued
+
+  const user = await User.findOne({ id });
+
+  if (
+    user?.passwordChangedAt &&
+    (await User.isJWTIssuedBeforePasswordChange(
+      user.passwordChangedAt,
+      decoded.iat as number,
+    ))
+  ) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      'Password was changed. Please login again',
+    );
+  }
+
+  // hash the new password
+  const hashedPassword = await bcrypt.hashSync(
+    newPassword,
+    Number(config.bcrypt_salt),
+  );
+
+  // update the user password
+
+  await User.findOneAndUpdate(
+    {
+      id,
+      role: decoded.role,
+    },
+    {
+      password: hashedPassword,
+      passwordChangedAt: new Date(),
+    },
+    {
+      new: true,
+    },
+  );
+
+  return null;
+};
+
 export const authService = {
   loginUserService,
   changePasswordService,
   refreshTokenService,
   forgotPasswordService,
+  resetPasswordService,
 };
