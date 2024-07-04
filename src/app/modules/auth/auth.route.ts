@@ -8,6 +8,7 @@ import {
   forgotPasswordValidationSchema,
   loginValidationSchema,
   refreshTokenValidationSchema,
+  resetPasswordValidationSchema,
 } from './auth.zod.validation';
 
 const router = express.Router();
@@ -35,6 +36,12 @@ router.post(
   '/forgot-password',
   validateRequest(forgotPasswordValidationSchema),
   authController.forgotPassword,
+);
+
+router.post(
+  '/reset-password',
+  validateRequest(resetPasswordValidationSchema),
+  authController.resetPassword,
 );
 
 export const authRoutes = router;
