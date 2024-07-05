@@ -199,6 +199,12 @@ const changeStatusService = async (id: string, status: string) => {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
   }
 
+  // check user is deleted or not
+
+  if (user.isDeleted) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'User is already deleted');
+  }
+
   const result = await User.findOneAndUpdate(
     { _id: id },
     { status },
