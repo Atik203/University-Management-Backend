@@ -24,10 +24,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StudentServices = void 0;
+/* eslint-disable @typescript-eslint/no-explicit-any */
 const http_status_1 = __importDefault(require("http-status"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const QueryBuilder_1 = __importDefault(require("../../builder/QueryBuilder"));
 const AppError_1 = __importDefault(require("../../Errors/AppError"));
+const sendImageToCloudnary_1 = require("../../utils/sendImageToCloudnary");
 const user_model_1 = require("../user/user.model");
 const student_constant_1 = require("./student.constant");
 const student_model_1 = require("./student.model");
@@ -86,13 +88,16 @@ const deleteStudentFromDB = (id) => __awaiter(void 0, void 0, void 0, function* 
         throw new AppError_1.default(http_status_1.default.INTERNAL_SERVER_ERROR, 'Failed to delete student');
     }
 });
-const updateStudentInDB = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
+const updateStudentInDB = (id, updateData, file) => __awaiter(void 0, void 0, void 0, function* () {
     const student = yield student_model_1.Student.isStudentExists(id);
     if (student === null) {
         throw new AppError_1.default(http_status_1.default.BAD_REQUEST, 'Student not found and failed to update');
     }
     const { name, guardian, localGuardian } = updateData, remaining = __rest(updateData, ["name", "guardian", "localGuardian"]);
-    const modifiedData = Object.assign({}, remaining);
+    const imageName = `${id}-${name === null || name === void 0 ? void 0 : name.firstName}-${name === null || name === void 0 ? void 0 : name.lastName}`;
+    const path = file.path;
+    const profileImg = yield (0, sendImageToCloudnary_1.sendImageToCloudnary)(imageName, path);
+    const modifiedData = Object.assign(Object.assign({}, remaining), { profileImg });
     if (name && Object.keys(name).length) {
         for (const [key, value] of Object.entries(name)) {
             modifiedData[`name.${key}`] = value;

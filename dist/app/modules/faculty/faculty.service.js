@@ -24,10 +24,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FacultyServices = void 0;
+/* eslint-disable @typescript-eslint/no-explicit-any */
 const http_status_1 = __importDefault(require("http-status"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const QueryBuilder_1 = __importDefault(require("../../builder/QueryBuilder"));
 const AppError_1 = __importDefault(require("../../Errors/AppError"));
+const sendImageToCloudnary_1 = require("../../utils/sendImageToCloudnary");
 const user_model_1 = require("../user/user.model");
 const faculty_constant_1 = require("./faculty.constant");
 const faculty_model_1 = require("./faculty.model");
@@ -45,9 +47,12 @@ const getSingleFacultyFromDB = (id) => __awaiter(void 0, void 0, void 0, functio
     const result = yield faculty_model_1.Faculty.findById(id).populate('academicDepartment');
     return result;
 });
-const updateFacultyIntoDB = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
+const updateFacultyIntoDB = (id, payload, file) => __awaiter(void 0, void 0, void 0, function* () {
     const { name } = payload, remainingFacultyData = __rest(payload, ["name"]);
-    const modifiedUpdatedData = Object.assign({}, remainingFacultyData);
+    const imageName = `${id}-${name === null || name === void 0 ? void 0 : name.firstName}-${name === null || name === void 0 ? void 0 : name.lastName}`;
+    const path = file.path;
+    const profileImg = yield (0, sendImageToCloudnary_1.sendImageToCloudnary)(imageName, path);
+    const modifiedUpdatedData = Object.assign(Object.assign({}, remainingFacultyData), { profileImg });
     if (name && Object.keys(name).length) {
         for (const [key, value] of Object.entries(name)) {
             modifiedUpdatedData[`name.${key}`] = value;

@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
 import mongoose from 'mongoose';
 import QueryBuilder from '../../builder/QueryBuilder';
 
 import AppError from '../../Errors/AppError';
+import { sendImageToCloudnary } from '../../utils/sendImageToCloudnary';
 import { User } from '../user/user.model';
 import { FacultySearchableFields } from './faculty.constant';
 import { TFaculty } from './faculty.interface';
@@ -29,11 +31,20 @@ const getSingleFacultyFromDB = async (id: string) => {
   return result;
 };
 
-const updateFacultyIntoDB = async (id: string, payload: Partial<TFaculty>) => {
+const updateFacultyIntoDB = async (
+  id: string,
+  payload: Partial<TFaculty>,
+  file: any,
+) => {
   const { name, ...remainingFacultyData } = payload;
+
+  const imageName = `${id}-${name?.firstName}-${name?.lastName}`;
+  const path = file.path;
+  const profileImg = await sendImageToCloudnary(imageName, path);
 
   const modifiedUpdatedData: Record<string, unknown> = {
     ...remainingFacultyData,
+    profileImg,
   };
 
   if (name && Object.keys(name).length) {

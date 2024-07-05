@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
 import mongoose from 'mongoose';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../Errors/AppError';
+import { sendImageToCloudnary } from '../../utils/sendImageToCloudnary';
 import { User } from '../user/user.model';
 import { AdminSearchableFields } from './admin.constant';
 import { TAdmin } from './admin.interface';
@@ -24,11 +26,20 @@ const getSingleAdminFromDB = async (id: string) => {
   return result;
 };
 
-const updateAdminIntoDB = async (id: string, payload: Partial<TAdmin>) => {
+const updateAdminIntoDB = async (
+  id: string,
+  payload: Partial<TAdmin>,
+  file: any,
+) => {
   const { name, ...remainingAdminData } = payload;
+
+  const imageName = `${id}-${name?.firstName}-${name?.lastName}`;
+  const path = file.path;
+  const profileImg = await sendImageToCloudnary(imageName, path);
 
   const modifiedUpdatedData: Record<string, unknown> = {
     ...remainingAdminData,
+    profileImg,
   };
 
   if (name && Object.keys(name).length) {

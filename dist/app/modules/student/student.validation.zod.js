@@ -23,7 +23,10 @@ const localGuardianSchema = zod_1.z.object({
 });
 const createStudentValidationSchema = zod_1.z.object({
     body: zod_1.z.object({
-        password: zod_1.z.string().min(4, 'Password must be at least 6 characters'),
+        password: zod_1.z
+            .string()
+            .min(4, 'Password must be at least 6 characters')
+            .optional(),
         student: zod_1.z.object({
             name: userNameSchema,
             gender: zod_1.z.enum(['male', 'female', 'other']),
@@ -38,7 +41,6 @@ const createStudentValidationSchema = zod_1.z.object({
             permanentAddress: zod_1.z.string().min(1, 'Permanent address is required'),
             guardian: guardianSchema,
             localGuardian: localGuardianSchema,
-            profileImg: zod_1.z.string().optional(),
             admissionSemester: zod_1.z.string().min(1, 'Admission semester is required'),
             academicDepartment: zod_1.z.string().min(1, 'Academic department is required'),
         }),
@@ -100,7 +102,6 @@ const updateStudentValidationSchema = zod_1.z.object({
                 .optional(),
             guardian: updateGuardianSchema.optional(),
             localGuardian: updateLocalGuardianSchema.optional(),
-            profileImg: zod_1.z.string().optional(),
             admissionSemester: zod_1.z
                 .string()
                 .min(1, 'Admission semester is required')

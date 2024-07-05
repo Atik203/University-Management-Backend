@@ -1,5 +1,6 @@
-import express, { NextFunction, Request, Response } from 'express';
+import express from 'express';
 import { auth } from '../../middleware/auth';
+import { parseRequestBodyData } from '../../middleware/parseRequestBodyData';
 import { validateRequest } from '../../middleware/validateRequest';
 import { upload } from '../../utils/sendImageToCloudnary';
 import { createAdminValidationSchema } from '../admin/admin.zod.validation';
@@ -14,22 +15,23 @@ const router = express.Router();
 router.post(
   '/create-student',
   upload.single('file'),
-  (req: Request, res: Response, next: NextFunction) => {
-    req.body = JSON.parse(req.body.data);
-    next();
-  },
+  parseRequestBodyData,
   validateRequest(studentValidations.createStudentValidationSchema),
   userController.createStudent,
 );
 
 router.post(
   '/create-faculty',
+  upload.single('file'),
+  parseRequestBodyData,
   validateRequest(createFacultyValidationSchema),
   userController.createFaculty,
 );
 
 router.post(
   '/create-admin',
+  upload.single('file'),
+  parseRequestBodyData,
   validateRequest(createAdminValidationSchema),
   userController.createAdmin,
 );
