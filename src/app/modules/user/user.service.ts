@@ -5,7 +5,6 @@ import AppError from '../../Errors/AppError';
 import { AcademicDepartment } from '../academicDepartment/academicDepartment.model';
 import { AcademicSemester } from '../academicSemester/academicSemester.model';
 import { Admin } from '../admin/admin.model';
-import { verifyToken } from '../auth/auth.utils';
 import { TFaculty } from '../faculty/faculty.interface';
 import { Faculty } from '../faculty/faculty.model';
 import { TStudent } from '../student/student.interface';
@@ -170,11 +169,7 @@ const createAdminIntoDB = async (password: string, payload: TFaculty) => {
   }
 };
 
-const getMeService = async (token: string) => {
-  const decoded = verifyToken(token, config.jwt_access_secret as string);
-
-  const { id, role } = decoded;
-
+const getMeService = async (id: string, role: string) => {
   let result = null;
 
   if (role === 'student') {
