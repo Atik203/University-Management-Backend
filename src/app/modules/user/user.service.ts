@@ -190,9 +190,27 @@ const getMeService = async (id: string, role: string) => {
   return result;
 };
 
+const changeStatusService = async (id: string, status: string) => {
+  // user exists or not
+
+  const user = await User.findOne({ _id: id });
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
+
+  const result = await User.findOneAndUpdate(
+    { _id: id },
+    { status },
+    { new: true },
+  );
+  return result;
+};
+
 export const userService = {
   createStudentIntoDB,
   createFacultyIntoDB,
   createAdminIntoDB,
   getMeService,
+  changeStatusService,
 };
