@@ -24,7 +24,10 @@ const localGuardianSchema = z.object({
 
 const createStudentValidationSchema = z.object({
   body: z.object({
-    password: z.string().min(4, 'Password must be at least 6 characters'),
+    password: z
+      .string()
+      .min(4, 'Password must be at least 6 characters')
+      .optional(),
     student: z.object({
       name: userNameSchema,
       gender: z.enum(['male', 'female', 'other']),
@@ -39,7 +42,6 @@ const createStudentValidationSchema = z.object({
       permanentAddress: z.string().min(1, 'Permanent address is required'),
       guardian: guardianSchema,
       localGuardian: localGuardianSchema,
-      profileImg: z.string().optional(),
       admissionSemester: z.string().min(1, 'Admission semester is required'),
       academicDepartment: z.string().min(1, 'Academic department is required'),
     }),
@@ -105,7 +107,6 @@ const updateStudentValidationSchema = z.object({
         .optional(),
       guardian: updateGuardianSchema.optional(),
       localGuardian: updateLocalGuardianSchema.optional(),
-      profileImg: z.string().optional(),
       admissionSemester: z
         .string()
         .min(1, 'Admission semester is required')

@@ -17,4 +17,7 @@ export default {
   reset_password_url: process.env.RESET_PASSWORD_URL,
   nodemailer_auth_user_email: process.env.NODEMAILER_AUTH_USER_EMAIL,
   nodemailer_auth_user_password: process.env.NODEMAILER_AUTH_USER_PASSWORD,
+  cloudinary_cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  cloudinary_api_key: process.env.CLOUDINARY_API_KEY,
+  cloudinary_api_secret: process.env.CLOUDINARY_API_SECRET,
 };
