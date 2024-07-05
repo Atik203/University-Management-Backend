@@ -2,6 +2,7 @@ import httpStatus from 'http-status';
 import mongoose from 'mongoose';
 import config from '../../config';
 import AppError from '../../Errors/AppError';
+import { sendImageToCloudnary } from '../../utils/sendImageToCloudnary';
 import { AcademicDepartment } from '../academicDepartment/academicDepartment.model';
 import { AcademicSemester } from '../academicSemester/academicSemester.model';
 import { Admin } from '../admin/admin.model';
@@ -19,7 +20,9 @@ import {
 const createStudentIntoDB = async (
   password: string,
   student: Partial<TStudent>,
-) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  file: any,
+): Promise<TStudent> => {
   const admissionSemester = await AcademicSemester.findById(
     student.admissionSemester,
   );
@@ -32,10 +35,18 @@ const createStudentIntoDB = async (
       throw new AppError(404, 'Admission semester not found');
     }
 
+    const id = await generateStudentID(admissionSemester);
+
+    const imageName = `${id}-${student.name?.firstName}-${student.name?.lastName}`;
+
+    const path = file.path;
+
+    const profileImg = await sendImageToCloudnary(imageName, path);
+
     const user: Partial<TUser> = {
       password: password || (config.default_password as string),
       role: 'student',
-      id: await generateStudentID(admissionSemester),
+      id,
       email: student.email,
     };
 
@@ -48,6 +59,7 @@ const createStudentIntoDB = async (
 
     student.id = newUser[0].id;
     student.user = newUser[0]._id;
+    student.profileImg = profileImg;
     const newStudent = await Student.create([student], { session });
 
     if (!newStudent.length) {
