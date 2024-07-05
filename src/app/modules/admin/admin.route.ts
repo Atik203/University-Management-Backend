@@ -1,6 +1,8 @@
 import express from 'express';
 
+import { parseRequestBodyData } from '../../middleware/parseRequestBodyData';
 import { validateRequest } from '../../middleware/validateRequest';
+import { upload } from '../../utils/sendImageToCloudnary';
 import { AdminControllers } from './admin.controller';
 import { updateAdminValidationSchema } from './admin.zod.validation';
 
@@ -12,6 +14,8 @@ router.get('/:id', AdminControllers.getSingleAdmin);
 
 router.patch(
   '/:id',
+  upload.single('file'),
+  parseRequestBodyData,
   validateRequest(updateAdminValidationSchema),
   AdminControllers.updateAdmin,
 );

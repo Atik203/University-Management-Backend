@@ -39,7 +39,7 @@ const getAllAdmins = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0
 const updateAdmin = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const { admin } = req.body;
-    const result = yield admin_service_1.AdminServices.updateAdminIntoDB(id, admin);
+    const result = yield admin_service_1.AdminServices.updateAdminIntoDB(id, admin, req.file);
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_1.default.OK,
         success: true,

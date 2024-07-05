@@ -24,10 +24,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AdminServices = void 0;
+/* eslint-disable @typescript-eslint/no-explicit-any */
 const http_status_1 = __importDefault(require("http-status"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const QueryBuilder_1 = __importDefault(require("../../builder/QueryBuilder"));
 const AppError_1 = __importDefault(require("../../Errors/AppError"));
+const sendImageToCloudnary_1 = require("../../utils/sendImageToCloudnary");
 const user_model_1 = require("../user/user.model");
 const admin_constant_1 = require("./admin.constant");
 const admin_model_1 = require("./admin.model");
@@ -45,9 +47,12 @@ const getSingleAdminFromDB = (id) => __awaiter(void 0, void 0, void 0, function*
     const result = yield admin_model_1.Admin.findById(id);
     return result;
 });
-const updateAdminIntoDB = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
+const updateAdminIntoDB = (id, payload, file) => __awaiter(void 0, void 0, void 0, function* () {
     const { name } = payload, remainingAdminData = __rest(payload, ["name"]);
-    const modifiedUpdatedData = Object.assign({}, remainingAdminData);
+    const imageName = `${id}-${name === null || name === void 0 ? void 0 : name.firstName}-${name === null || name === void 0 ? void 0 : name.lastName}`;
+    const path = file.path;
+    const profileImg = yield (0, sendImageToCloudnary_1.sendImageToCloudnary)(imageName, path);
+    const modifiedUpdatedData = Object.assign(Object.assign({}, remainingAdminData), { profileImg });
     if (name && Object.keys(name).length) {
         for (const [key, value] of Object.entries(name)) {
             modifiedUpdatedData[`name.${key}`] = value;

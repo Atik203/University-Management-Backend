@@ -66,8 +66,29 @@ const refreshToken = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0
         data: result,
     });
 }));
+const forgotPassword = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield auth_service_1.authService.forgotPasswordService(req.body);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: 'Password reset link sent successfully',
+        data: result,
+    });
+}));
+const resetPassword = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const token = req.headers.authorization;
+    const result = yield auth_service_1.authService.resetPasswordService(req.body, token);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: 'Password reset successfully',
+        data: result,
+    });
+}));
 exports.authController = {
     loginUser,
     changePassword,
     refreshToken,
+    forgotPassword,
+    resetPassword,
 };

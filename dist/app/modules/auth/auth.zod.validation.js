@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.refreshTokenValidationSchema = exports.changePasswordValidationSchema = exports.loginValidationSchema = void 0;
+exports.resetPasswordValidationSchema = exports.forgotPasswordValidationSchema = exports.refreshTokenValidationSchema = exports.changePasswordValidationSchema = exports.loginValidationSchema = void 0;
 const zod_1 = require("zod");
 exports.loginValidationSchema = zod_1.z.object({
     body: zod_1.z.object({
@@ -54,6 +54,23 @@ exports.refreshTokenValidationSchema = zod_1.z.object({
     cookies: zod_1.z.object({
         refreshToken: zod_1.z.string({
             required_error: 'refreshToken is required',
+        }),
+    }),
+});
+exports.forgotPasswordValidationSchema = zod_1.z.object({
+    body: zod_1.z.object({
+        id: zod_1.z.string({
+            required_error: 'id is required',
+        }),
+    }),
+});
+exports.resetPasswordValidationSchema = zod_1.z.object({
+    body: zod_1.z.object({
+        id: zod_1.z.string({
+            required_error: 'id is required',
+        }),
+        newPassword: zod_1.z.string({
+            required_error: 'newPassword is required',
         }),
     }),
 });

@@ -39,7 +39,7 @@ const getAllFaculties = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(voi
 const updateFaculty = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const { faculty } = req.body;
-    const result = yield faculty_service_1.FacultyServices.updateFacultyIntoDB(id, faculty);
+    const result = yield faculty_service_1.FacultyServices.updateFacultyIntoDB(id, faculty, req.file);
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
