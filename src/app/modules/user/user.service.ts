@@ -5,6 +5,7 @@ import AppError from '../../Errors/AppError';
 import { AcademicDepartment } from '../academicDepartment/academicDepartment.model';
 import { AcademicSemester } from '../academicSemester/academicSemester.model';
 import { Admin } from '../admin/admin.model';
+import { verifyToken } from '../auth/auth.utils';
 import { TFaculty } from '../faculty/faculty.interface';
 import { Faculty } from '../faculty/faculty.model';
 import { TStudent } from '../student/student.interface';
@@ -169,8 +170,34 @@ const createAdminIntoDB = async (password: string, payload: TFaculty) => {
   }
 };
 
+const getMeService = async (token: string) => {
+  const decoded = verifyToken(token, config.jwt_access_secret as string);
+
+  const { id, role } = decoded;
+
+  let result = null;
+
+  if (role === 'student') {
+    result = await Student.findOne({ id })
+      .populate('user')
+      .populate('academicSemester')
+      .populate('academicDepartment');
+  }
+  if (role === 'faculty') {
+    result = await Faculty.findOne({ id })
+      .populate('user')
+      .populate('academicDepartment');
+  }
+  if (role === 'admin') {
+    result = await Admin.findOne({ id }).populate('user');
+  }
+
+  return result;
+};
+
 export const userService = {
   createStudentIntoDB,
   createFacultyIntoDB,
   createAdminIntoDB,
+  getMeService,
 };

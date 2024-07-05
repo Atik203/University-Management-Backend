@@ -1,4 +1,5 @@
 import httpStatus from 'http-status';
+import AppError from '../../Errors/AppError';
 import { catchAsync } from '../../utils/catchAsync';
 import { sendResponse } from '../../utils/sendResponse';
 import { userService } from './user.service';
@@ -40,8 +41,25 @@ const createAdmin = catchAsync(async (req, res) => {
   });
 });
 
+const getMe = catchAsync(async (req, res) => {
+  const token = req.headers.authorization;
+
+  if (!token) {
+    throw new AppError(httpStatus.UNAUTHORIZED, 'Token not found');
+  }
+
+  const result = await userService.getMeService(token);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User details',
+    data: result,
+  });
+});
+
 export const userController = {
   createStudent,
   createFaculty,
   createAdmin,
+  getMe,
 };
