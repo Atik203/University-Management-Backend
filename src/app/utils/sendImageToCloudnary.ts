@@ -1,4 +1,5 @@
 import { v2 as cloudinary } from 'cloudinary';
+import fs from 'fs';
 import httpStatus from 'http-status';
 import multer from 'multer';
 import config from '../config';
@@ -27,6 +28,13 @@ export const sendImageToCloudnary = async (imageName: string, path: string) => {
     height: 400,
     fetch_format: 'auto',
     quality: 'auto',
+  });
+
+  // delete the image from the local storage
+  fs.unlink(path, (err) => {
+    if (err) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Error deleting image');
+    }
   });
 
   return autoCropUrl;
