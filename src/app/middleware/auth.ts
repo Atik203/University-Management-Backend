@@ -1,10 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
 
 import httpStatus from 'http-status';
-import { JwtPayload } from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../config';
 import AppError from '../Errors/AppError';
-import { verifyToken } from '../modules/auth/auth.utils';
 import { TUserRole } from '../modules/user/user.interface';
 import { User } from '../modules/user/user.model';
 import { catchAsync } from '../utils/catchAsync';
@@ -21,7 +20,7 @@ export const auth = (...requiredRoles: TUserRole[]) => {
 
     // verify token
 
-    const decoded = verifyToken(
+    const decoded = jwt.verify(
       token,
       config.jwt_access_secret as string,
     ) as JwtPayload;
