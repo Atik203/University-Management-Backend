@@ -14,6 +14,7 @@ router.get('/:id', FacultyControllers.getSingleFaculty);
 
 router.patch(
   '/:id',
+  auth(USER_ROLE.admin),
   upload.single('file'),
   parseRequestBodyData,
   validateRequest(updateFacultyValidationSchema),

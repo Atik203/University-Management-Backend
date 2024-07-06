@@ -1,5 +1,7 @@
 import express from 'express';
+import { auth } from '../../middleware/auth';
 import { validateRequest } from '../../middleware/validateRequest';
+import { USER_ROLE } from '../user/user.constant';
 import { semesterRegistrationController } from './semesterRegistration.controller';
 import {
   createSemesterRegistrationSchema,
@@ -10,6 +12,7 @@ const router = express.Router();
 
 router.post(
   '/create-semester-registration',
+  auth(USER_ROLE.admin),
   validateRequest(createSemesterRegistrationSchema),
   semesterRegistrationController.createSemesterRegistration,
 );
@@ -21,6 +24,7 @@ router.get(
 
 router.patch(
   '/:id',
+  auth(USER_ROLE.admin),
   validateRequest(updateSemesterRegistrationSchema),
   semesterRegistrationController.updateSemesterRegistration,
 );

@@ -14,6 +14,7 @@ const router = express.Router();
 
 router.post(
   '/create-student',
+  auth(USER_ROLE.admin),
   upload.single('file'),
   parseRequestBodyData,
   validateRequest(studentValidations.createStudentValidationSchema),
@@ -22,6 +23,7 @@ router.post(
 
 router.post(
   '/create-faculty',
+  auth(USER_ROLE.admin),
   upload.single('file'),
   parseRequestBodyData,
   validateRequest(createFacultyValidationSchema),
@@ -30,6 +32,7 @@ router.post(
 
 router.post(
   '/create-admin',
+  auth(USER_ROLE.admin),
   upload.single('file'),
   parseRequestBodyData,
   validateRequest(createAdminValidationSchema),

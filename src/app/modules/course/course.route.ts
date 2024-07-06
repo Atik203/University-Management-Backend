@@ -1,5 +1,7 @@
 import express from 'express';
+import { auth } from '../../middleware/auth';
 import { validateRequest } from '../../middleware/validateRequest';
+import { USER_ROLE } from '../user/user.constant';
 import { courseController } from './course.controller';
 import {
   assignFacultiesValidationSchema,
@@ -11,6 +13,7 @@ const router = express.Router();
 
 router.post(
   '/create-course',
+  auth(USER_ROLE.admin),
   validateRequest(createCourseValidationSchema),
   courseController.createCourse,
 );
@@ -21,18 +24,24 @@ router.get('/:id', courseController.getSingleCourse);
 
 router.patch(
   '/:id',
+  auth(USER_ROLE.admin),
   validateRequest(updateCourseValidationSchema),
   courseController.updateCourse,
 );
 
-router.delete('/:id', courseController.deleteCourse);
+router.delete('/:id', auth(USER_ROLE.admin), courseController.deleteCourse);
 
 router.put(
   '/:courseId/assign-faculties',
+  auth(USER_ROLE.admin),
   validateRequest(assignFacultiesValidationSchema),
   courseController.assignFaculties,
 );
 
-router.delete('/:courseId/remove-faculties', courseController.removeFaculties);
+router.delete(
+  '/:courseId/remove-faculties',
+  auth(USER_ROLE.admin),
+  courseController.removeFaculties,
+);
 
 export const courseRoutes = router;
