@@ -13,7 +13,11 @@ router.get('/:id', StudentControllers.getSingleStudent);
 
 router.delete('/:id', auth(USER_ROLE.admin), StudentControllers.deleteStudent);
 
-router.get('/', auth(USER_ROLE.admin), StudentControllers.getAllStudents);
+router.get(
+  '/',
+  // auth(USER_ROLE.admin, 'faculty', 'student'),
+  StudentControllers.getAllStudents,
+);
 
 router.patch(
   '/:id',

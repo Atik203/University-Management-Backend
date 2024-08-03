@@ -2,7 +2,8 @@ import { TEnrolledCourse } from './enrolledCourse.interface';
 import EnrolledCourse from './enrolledCourse.model';
 
 const createEnrolledCourseIntoDB = async (
-  enrolledCourseData: TEnrolledCourse,
+  id: string,
+  payload: TEnrolledCourse,
 ) => {
   const enrolledCourse = await EnrolledCourse.create(enrolledCourseData);
   return enrolledCourse;
