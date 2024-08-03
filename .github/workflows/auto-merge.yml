@@ -1,12 +1,25 @@
-name: Enable Auto Merge
+name: automatically merge dependabot PR's
+
 on:
-  pull_request_target:
-    branches:
-      - main
+  pull_request:
+    branches: [main]
 
 jobs:
-  auto-merge:
+  auto-merge-dependabot:
+    name: 🤖 Auto merge dependabot PR
+    timeout-minutes: 10
+    if: ${{ github.actor == 'dependabot[bot]' && github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
     steps:
-      - uses: kenhowardpdx/auto-merge-action@v1.1.0
-        if: ${{ github.actor == 'dependabot[bot]' }}
+      - name: Check out the repository
+        uses: actions/checkout@v2
+
+      - name: 🤖 Merge PR from dependabot
+        uses: fastify/github-action-merge-dependabot@v3.6.4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          target: minor
+          merge-method: rebase
