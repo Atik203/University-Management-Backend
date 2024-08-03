@@ -14,7 +14,7 @@ router.get('/:id', OfferedCourseControllers.getSingleOfferedCourses);
 
 router.post(
   '/create-offered-course',
-  auth(USER_ROLE.admin),
+  // auth(USER_ROLE.admin),
   validateRequest(OfferedCourseValidations.createOfferedCourseValidationSchema),
   OfferedCourseControllers.createOfferedCourse,
 );
