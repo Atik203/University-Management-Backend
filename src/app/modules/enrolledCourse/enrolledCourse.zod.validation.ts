@@ -20,7 +20,7 @@ const updateEnrolledCourseMarksValidationZodSchema = z.object({
   }),
 });
 
-export const EnrolledCourseValidations = {
+export const enrolledCourseValidations = {
   createEnrolledCourseValidationZodSchema,
   updateEnrolledCourseMarksValidationZodSchema,
 };
