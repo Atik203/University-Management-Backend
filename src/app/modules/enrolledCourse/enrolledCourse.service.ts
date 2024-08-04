@@ -9,6 +9,7 @@ import { SemesterRegistration } from '../semesterRegistration/semesterRegistrati
 import { Student } from '../student/student.model';
 import { TEnrolledCourse } from './enrolledCourse.interface';
 import EnrolledCourse from './enrolledCourse.model';
+import { calculateGradeAndPoint } from './enrolledCourse.utils';
 
 const createEnrolledCourseIntoDB = async (
   userId: string,
@@ -196,6 +197,12 @@ const updateEnrolledCourseMarksIntoDB = async (
       Math.ceil(classTest2 * 0.1) +
       Math.ceil(midTerm * 0.3) +
       Math.ceil(courseMarks.finalTerm * 0.5);
+
+    const result = calculateGradeAndPoint(totalMarks);
+
+    modifiedData.grade = result.grade;
+    modifiedData.gradePoints = result.gradePoint;
+    modifiedData.isCompleted = true;
   }
 
   if (courseMarks && Object.keys(courseMarks).length > 0) {
