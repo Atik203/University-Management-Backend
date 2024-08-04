@@ -23,8 +23,12 @@ const getAllCoursesFromDB = async (query: Record<string, unknown>) => {
     .search(CourseSearchAbleFields);
 
   const result = await courseQuery.modelQuery;
+  const meta = await courseQuery.countTotal();
 
-  return result;
+  return {
+    meta,
+    result,
+  };
 };
 
 const getSingleCourseFromDB = async (id: string) => {

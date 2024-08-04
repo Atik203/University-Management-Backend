@@ -222,7 +222,31 @@ const updateEnrolledCourseMarksIntoDB = async (
   return result;
 };
 
+const getAllEnrolledCoursesFromDB = async () => {
+  const result = await EnrolledCourse.find()
+    .populate('semesterRegistration')
+    .populate('student')
+    .populate('faculty')
+    .populate('course')
+    .populate('offeredCourse');
+
+  return result;
+};
+
+const getSingleEnrolledCourseFromDB = async (id: string) => {
+  const result = await EnrolledCourse.findById(id)
+    .populate('semesterRegistration')
+    .populate('student')
+    .populate('faculty')
+    .populate('course')
+    .populate('offeredCourse');
+
+  return result;
+};
+
 export const enrolledCourseService = {
   createEnrolledCourseIntoDB,
   updateEnrolledCourseMarksIntoDB,
+  getAllEnrolledCoursesFromDB,
+  getSingleEnrolledCourseFromDB,
 };
