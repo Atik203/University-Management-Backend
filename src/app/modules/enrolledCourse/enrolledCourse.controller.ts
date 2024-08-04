@@ -30,7 +30,31 @@ const updateEnrolledCourse = catchAsync(async (req, res) => {
   });
 });
 
+const getAllEnrolledCourses = catchAsync(async (req, res) => {
+  const result = await enrolledCourseService.getAllEnrolledCoursesFromDB();
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'All Enrolled Courses retrieved successfully',
+    data: result,
+  });
+});
+
+const getSingleEnrolledCourse = catchAsync(async (req, res) => {
+  const result = await enrolledCourseService.getSingleEnrolledCourseFromDB(
+    req.params.id,
+  );
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Single Enrolled Course retrieved successfully',
+    data: result,
+  });
+});
+
 export const enrolledCourseController = {
   createEnrolledCourse,
   updateEnrolledCourse,
+  getAllEnrolledCourses,
+  getSingleEnrolledCourse,
 };
