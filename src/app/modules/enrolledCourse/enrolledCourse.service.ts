@@ -141,13 +141,13 @@ const updateEnrolledCourseMarksIntoDB = async (
   facultyId: string,
   payload: Partial<TEnrolledCourse>,
 ) => {
-  const isFacultyExists = await Faculty.findById(facultyId);
+  const { semesterRegistration, student, offeredCourse, courseMarks } = payload;
+
+  const isFacultyExists = await Faculty.findOne({ id: facultyId }, { _id: 1 });
 
   if (!isFacultyExists) {
     throw new AppError(httpStatus.NOT_FOUND, 'Faculty not found!');
   }
-
-  const { semesterRegistration, student, offeredCourse, courseMarks } = payload;
 
   const isSemesterRegistrationExists =
     await SemesterRegistration.findById(semesterRegistration);
@@ -170,6 +170,38 @@ const updateEnrolledCourseMarksIntoDB = async (
   if (!isOfferedCourseExists) {
     throw new AppError(httpStatus.NOT_FOUND, 'Offered course not found!');
   }
+
+  const isCourseBelongsToFaculty = await EnrolledCourse.findOne({
+    faculty: isFacultyExists?._id,
+    offeredCourse,
+    semesterRegistration,
+    student,
+  });
+
+  if (!isCourseBelongsToFaculty) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      'You are not authorized to update marks for this course!',
+    );
+  }
+
+  const modifiedData: Record<string, unknown> = { ...courseMarks };
+
+  if (courseMarks && Object.keys(courseMarks).length > 0) {
+    for (const [key, value] of Object.entries(courseMarks)) {
+      modifiedData[`courseMarks.${key}`] = value;
+    }
+  }
+
+  const result = await EnrolledCourse.findOneAndUpdate(
+    isCourseBelongsToFaculty._id,
+    {
+      $set: modifiedData,
+    },
+    { new: true },
+  );
+
+  return result;
 };
 
 export const enrolledCourseService = {
