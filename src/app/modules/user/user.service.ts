@@ -27,22 +27,29 @@ const createStudentIntoDB = async (
   const admissionSemester = await AcademicSemester.findById(
     student.admissionSemester,
   );
+  if (!admissionSemester) {
+    throw new AppError(404, 'Admission semester not found');
+  }
+  const academicDepartment = await AcademicDepartment.findById(
+    student.academicDepartment,
+  );
 
+  if (!academicDepartment) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Academic department not found');
+  }
+
+  student.academicFaculty = academicDepartment.academicFaculty;
   const session = await mongoose.startSession();
 
   try {
     session.startTransaction();
-    if (!admissionSemester) {
-      throw new AppError(404, 'Admission semester not found');
-    }
-
     const id = await generateStudentID(admissionSemester);
-
-    const imageName = `${id}-${student.name?.firstName}-${student.name?.lastName}`;
-
-    const path = file.path;
-
-    const profileImg = await sendImageToCloudnary(imageName, path);
+    if (file) {
+      const imageName = `${id}-${student.name?.firstName}-${student.name?.lastName}`;
+      const path = file.path;
+      const profileImg = await sendImageToCloudnary(imageName, path);
+      student.profileImg = profileImg;
+    }
 
     const user: Partial<TUser> = {
       password: password || (config.default_password as string),
@@ -60,7 +67,7 @@ const createStudentIntoDB = async (
 
     student.id = newUser[0].id;
     student.user = newUser[0]._id;
-    student.profileImg = profileImg;
+
     const newStudent = await Student.create([student], { session });
 
     if (!newStudent.length) {
@@ -109,9 +116,7 @@ const createFacultyIntoDB = async (
     //set  generated id
 
     const id = await generateFacultyId();
-
     userData.id = id;
-
     // create a user (transaction-1)
     const newUser = await User.create([userData], { session }); // array
 
@@ -121,13 +126,14 @@ const createFacultyIntoDB = async (
     }
 
     // upload image to cloudinary
-    const imageName = `${id}-${payload.name?.firstName}-${payload.name?.lastName}`;
-    const path = file.path;
 
-    const profileImg = await sendImageToCloudnary(imageName, path);
+    if (file) {
+      const imageName = `${id}-${payload.name?.firstName}-${payload.name?.lastName}`;
+      const path = file.path;
+      const profileImg = await sendImageToCloudnary(imageName, path);
+      payload.profileImg = profileImg;
+    }
 
-    // set id , _id as user
-    payload.profileImg = profileImg;
     payload.id = newUser[0].id;
     payload.user = newUser[0]._id; //reference _id
 
@@ -183,14 +189,14 @@ const createAdminIntoDB = async (
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create admin');
     }
 
-    // upload image to cloudinary
-    const imageName = `${id}-${payload.name?.firstName}-${payload.name?.lastName}`;
-    const path = file.path;
+    if (file) {
+      // upload image to cloudinary
+      const imageName = `${id}-${payload.name?.firstName}-${payload.name?.lastName}`;
+      const path = file.path;
+      const profileImg = await sendImageToCloudnary(imageName, path);
+      payload.profileImg = profileImg;
+    }
 
-    const profileImg = await sendImageToCloudnary(imageName, path);
-
-    // set id , _id as user
-    payload.profileImg = profileImg;
     payload.id = newUser[0].id;
     payload.user = newUser[0]._id; //reference _id
 
