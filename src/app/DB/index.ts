@@ -14,7 +14,7 @@ const superUser = {
 
 const seedSuperAdmin = async () => {
   const isSuperAdminExist = await User.findOne({
-    role: 'super-admin',
+    role: USER_ROLE.superAdmin,
   });
 
   if (!isSuperAdminExist) {
