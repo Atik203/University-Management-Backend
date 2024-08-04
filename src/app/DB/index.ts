@@ -1,4 +1,5 @@
 import config from '../config';
+import { USER_ROLE } from '../modules/user/user.constant';
 import { User } from '../modules/user/user.model';
 
 const superUser = {
@@ -6,7 +7,7 @@ const superUser = {
   email: 'superadmin@gmail.com',
   password: config.super_admin_password,
   needsPasswordChange: false,
-  role: 'super-admin',
+  role: USER_ROLE.superAdmin,
   status: 'in-progress',
   isDeleted: false,
 };
