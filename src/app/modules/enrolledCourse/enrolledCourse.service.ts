@@ -3,6 +3,7 @@ import httpStatus from 'http-status';
 import mongoose from 'mongoose';
 import AppError from '../../Errors/AppError';
 import { Course } from '../course/course.model';
+import { Faculty } from '../faculty/faculty.model';
 import { OfferedCourse } from '../offeredCourse/offeredCourse.model';
 import { SemesterRegistration } from '../semesterRegistration/semesterRegistration.model';
 import { Student } from '../student/student.model';
@@ -22,7 +23,7 @@ const createEnrolledCourseIntoDB = async (
   }
 
   if (isOfferedCourseExists.maxCapacity <= 0) {
-    throw new AppError(httpStatus.BAD_GATEWAY, 'Room is full!');
+    throw new AppError(httpStatus.BAD_GATEWAY, 'Course is full!');
   }
 
   const student = await Student.findOne({ id: userId }, { _id: 1 });
@@ -136,6 +137,42 @@ const createEnrolledCourseIntoDB = async (
   }
 };
 
+const updateEnrolledCourseMarksIntoDB = async (
+  facultyId: string,
+  payload: Partial<TEnrolledCourse>,
+) => {
+  const isFacultyExists = await Faculty.findById(facultyId);
+
+  if (!isFacultyExists) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Faculty not found!');
+  }
+
+  const { semesterRegistration, student, offeredCourse, courseMarks } = payload;
+
+  const isSemesterRegistrationExists =
+    await SemesterRegistration.findById(semesterRegistration);
+
+  if (!isSemesterRegistrationExists) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      'Semester registration not found!',
+    );
+  }
+
+  const isStudentExists = await Student.findById(student);
+
+  if (!isStudentExists) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Student not found!');
+  }
+
+  const isOfferedCourseExists = await OfferedCourse.findById(offeredCourse);
+
+  if (!isOfferedCourseExists) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Offered course not found!');
+  }
+};
+
 export const enrolledCourseService = {
   createEnrolledCourseIntoDB,
+  updateEnrolledCourseMarksIntoDB,
 };
