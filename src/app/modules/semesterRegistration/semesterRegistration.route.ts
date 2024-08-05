@@ -19,7 +19,12 @@ router.post(
 
 router.get(
   '/:id',
-  auth(USER_ROLE.admin, USER_ROLE.superAdmin),
+  auth(
+    USER_ROLE.admin,
+    USER_ROLE.superAdmin,
+    USER_ROLE.student,
+    USER_ROLE.faculty,
+  ),
   semesterRegistrationController.getSingleSemesterRegistration,
 );
 
@@ -32,7 +37,12 @@ router.patch(
 
 router.get(
   '/',
-  auth(USER_ROLE.admin, USER_ROLE.superAdmin),
+  auth(
+    USER_ROLE.admin,
+    USER_ROLE.superAdmin,
+    USER_ROLE.student,
+    USER_ROLE.faculty,
+  ),
   semesterRegistrationController.getAllSemesterRegistration,
 );
 
