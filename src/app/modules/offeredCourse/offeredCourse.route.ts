@@ -9,6 +9,12 @@ import { OfferedCourseValidations } from './offeredCourse.zod.validation';
 const router = express.Router();
 
 router.get(
+  '/my-offered-courses',
+  auth(USER_ROLE.student),
+  OfferedCourseControllers.getMyOfferedCourses,
+);
+
+router.get(
   '/',
   auth(USER_ROLE.admin, USER_ROLE.superAdmin, USER_ROLE.faculty),
   OfferedCourseControllers.getAllOfferedCourses,
@@ -43,12 +49,6 @@ router.delete(
   '/:id',
   auth(USER_ROLE.admin, USER_ROLE.superAdmin),
   OfferedCourseControllers.deleteOfferedCourseFromDB,
-);
-
-router.get(
-  '/my-offered-courses',
-  auth(USER_ROLE.student),
-  OfferedCourseControllers.getMyOfferedCourses,
 );
 
 export const offeredCourseRoutes = router;
