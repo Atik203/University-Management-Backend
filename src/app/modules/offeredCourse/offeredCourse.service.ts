@@ -411,7 +411,6 @@ const getMyOfferedCoursesFromDb = async (
             },
           ],
         },
-
         isAlreadyEnrolled: {
           $in: [
             '$course._id',
