@@ -223,15 +223,25 @@ const updateEnrolledCourseMarksIntoDB = async (
   return result;
 };
 
-const getAllEnrolledCoursesFromDB = async () => {
-  const result = await EnrolledCourse.find()
-    .populate('semesterRegistration')
-    .populate('student')
-    .populate('faculty')
-    .populate('course')
-    .populate('offeredCourse');
+const getAllEnrolledCoursesFromDB = async (query: Record<string, unknown>) => {
+  const enrolledCourseQuery = new QueryBuilder(
+    EnrolledCourse.find().populate(
+      'semesterRegistration offeredCourse course student faculty',
+    ),
+    query,
+  )
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
 
-  return result;
+  const result = await enrolledCourseQuery.modelQuery;
+  const meta = await enrolledCourseQuery.countTotal();
+
+  return {
+    meta,
+    result,
+  };
 };
 
 const getSingleEnrolledCourseFromDB = async (id: string) => {
