@@ -16,19 +16,19 @@ router.post(
 
 router.get(
   '/',
-  auth(USER_ROLE.admin),
+  auth(USER_ROLE.admin, USER_ROLE.superAdmin),
   academicFacultyController.getAcademicFaculty,
 );
 
 router.get(
   '/:id',
-  auth(USER_ROLE.admin),
+  auth(USER_ROLE.admin, USER_ROLE.superAdmin),
   academicFacultyController.getAcademicFacultyById,
 );
 
 router.patch(
   '/:id',
-  auth(USER_ROLE.admin),
+  auth(USER_ROLE.admin, USER_ROLE.superAdmin),
   validateRequest(academicFacultyValidation.updateAcademicFacultySchema),
   academicFacultyController.updateAcademicFaculty,
 );
