@@ -235,6 +235,9 @@ const getMeService = async (id: string, role: string) => {
   if (role === 'admin') {
     result = await Admin.findOne({ id }).populate('user');
   }
+  if (role === 'superAdmin') {
+    result = await User.findOne({ id });
+  }
 
   return result;
 };
