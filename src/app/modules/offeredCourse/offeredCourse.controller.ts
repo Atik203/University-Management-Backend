@@ -66,9 +66,11 @@ const deleteOfferedCourseFromDB = catchAsync(
     });
   },
 );
+
 const getMyOfferedCourses = catchAsync(async (req, res) => {
   const result = await OfferedCourseServices.getMyOfferedCoursesFromDb(
     req.user.id,
+    req.query,
   );
   sendResponse(res, {
     statusCode: httpStatus.OK,

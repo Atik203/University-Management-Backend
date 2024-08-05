@@ -4,5 +4,6 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
-  "workbench.colorTheme": "Learn with Sumit - Shades of Grey"
+  "workbench.colorTheme": "Learn with Sumit - Shades of Grey",
+  "cSpell.words": ["enrolledcourses"]
 }
