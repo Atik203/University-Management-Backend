@@ -1,6 +1,7 @@
 import express from 'express';
 import { auth } from '../../middleware/auth';
 import { validateRequest } from '../../middleware/validateRequest';
+import { USER_ROLE } from '../user/user.constant';
 import { enrolledCourseController } from './enrolledCourse.controller';
 import { enrolledCourseValidations } from './enrolledCourse.zod.validation';
 
@@ -8,7 +9,7 @@ const router = express.Router();
 
 router.post(
   '/create-enrolled-course',
-  auth('student'),
+  auth(USER_ROLE.student),
   validateRequest(
     enrolledCourseValidations.createEnrolledCourseValidationZodSchema,
   ),
@@ -17,7 +18,7 @@ router.post(
 
 router.patch(
   '/update-enrolled-course-marks',
-  auth('faculty'),
+  auth(USER_ROLE.faculty, USER_ROLE.admin, USER_ROLE.superAdmin),
   validateRequest(
     enrolledCourseValidations.updateEnrolledCourseMarksValidationZodSchema,
   ),
@@ -26,13 +27,13 @@ router.patch(
 
 router.get(
   '/',
-  //  auth('admin'),
+  auth(USER_ROLE.admin, USER_ROLE.superAdmin, USER_ROLE.student),
   enrolledCourseController.getAllEnrolledCourses,
 );
 
 router.get(
   '/:id',
-  // auth('admin'),
+  auth(USER_ROLE.admin, USER_ROLE.superAdmin, USER_ROLE.student),
   enrolledCourseController.getSingleEnrolledCourse,
 );
 
