@@ -43,17 +43,14 @@ const createSemesterRegistrationIntoDB = (payload) => __awaiter(void 0, void 0, 
     return result;
 });
 const getAllSemesterRegistrationFromDB = (query) => __awaiter(void 0, void 0, void 0, function* () {
-    const semesterRegistrationQuery = new QueryBuilder_1.default(semesterRegistration_model_1.SemesterRegistration.find().populate('academicSemester'), query)
+    const builder = new QueryBuilder_1.default(semesterRegistration_model_1.SemesterRegistration.find().populate('academicSemester'), query)
         .filter()
         .sort()
         .paginate()
         .fields();
-    const result = semesterRegistrationQuery.modelQuery;
-    const meta = semesterRegistrationQuery.countTotal();
-    return {
-        result,
-        meta,
-    };
+    const result = yield builder.modelQuery;
+    const meta = yield builder.countTotal();
+    return { result, meta };
 });
 const getSingleSemesterRegistrationFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = semesterRegistration_model_1.SemesterRegistration.findById(id);
