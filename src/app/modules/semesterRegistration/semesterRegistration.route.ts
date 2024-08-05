@@ -12,23 +12,28 @@ const router = express.Router();
 
 router.post(
   '/create-semester-registration',
-  auth(USER_ROLE.admin),
+  auth(USER_ROLE.admin, USER_ROLE.superAdmin),
   validateRequest(createSemesterRegistrationSchema),
   semesterRegistrationController.createSemesterRegistration,
 );
 
 router.get(
   '/:id',
+  auth(USER_ROLE.admin, USER_ROLE.superAdmin),
   semesterRegistrationController.getSingleSemesterRegistration,
 );
 
 router.patch(
   '/:id',
-  auth(USER_ROLE.admin),
+  auth(USER_ROLE.admin, USER_ROLE.superAdmin),
   validateRequest(updateSemesterRegistrationSchema),
   semesterRegistrationController.updateSemesterRegistration,
 );
 
-router.get('/', semesterRegistrationController.getAllSemesterRegistration);
+router.get(
+  '/',
+  auth(USER_ROLE.admin, USER_ROLE.superAdmin),
+  semesterRegistrationController.getAllSemesterRegistration,
+);
 
 export const semesterRegistrationRoutes = router;
