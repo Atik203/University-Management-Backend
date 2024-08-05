@@ -35,7 +35,8 @@ const loginUser = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, v
     res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
         secure: config_1.default.NODE_ENV === 'production',
-        sameSite: 'none',
+        sameSite: 'none', // for protection  same site none and we can't use cookie policy in free hosting
+        maxAge: 1000 * 60 * 60 * 24 * 365, // 365 days
     });
     (0, sendResponse_1.sendResponse)(res, {
         success: true,

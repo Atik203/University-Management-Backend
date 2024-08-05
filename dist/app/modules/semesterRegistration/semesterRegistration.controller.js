@@ -32,7 +32,8 @@ const getAllSemesterRegistration = (0, catchAsync_1.catchAsync)((req, res) => __
         statusCode: http_status_1.default.OK,
         success: true,
         message: 'Semester registration fetched successfully',
-        data: result,
+        meta: result.meta,
+        data: result.result,
     });
 }));
 const getSingleSemesterRegistration = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {

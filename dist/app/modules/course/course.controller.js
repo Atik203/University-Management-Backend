@@ -32,7 +32,8 @@ const getAllCourses = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 
         statusCode: http_status_1.default.OK,
         success: true,
         message: 'All courses fetched successfully',
-        data: result,
+        meta: result.meta,
+        data: result.result,
     });
 }));
 const getSingleCourse = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -84,6 +85,16 @@ const removeFaculties = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(voi
         data: result,
     });
 }));
+const getCourseFaculties = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { courseId } = req.params;
+    const result = yield course_service_1.courseService.getCourseFacultiesFromDB(courseId);
+    (0, sendResponse_1.sendResponse)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: 'Faculties fetched successfully',
+        data: result,
+    });
+}));
 exports.courseController = {
     createCourse,
     getSingleCourse,
@@ -92,4 +103,5 @@ exports.courseController = {
     deleteCourse,
     assignFaculties,
     removeFaculties,
+    getCourseFaculties,
 };

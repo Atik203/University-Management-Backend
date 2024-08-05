@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.academicSemesterService = void 0;
+const QueryBuilder_1 = __importDefault(require("../../builder/QueryBuilder"));
 const AppError_1 = __importDefault(require("../../Errors/AppError"));
 const academicSemester_constant_1 = require("./academicSemester.constant");
 const academicSemester_model_1 = require("./academicSemester.model");
@@ -24,9 +25,19 @@ const createAcademicSemesterIntoDB = (academicSemester) => __awaiter(void 0, voi
     const result = yield academicSemester_model_1.AcademicSemester.create(academicSemester);
     return result;
 });
-const getAcademicSemesterFromDB = () => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield academicSemester_model_1.AcademicSemester.find();
-    return result;
+const getAcademicSemesterFromDB = (query) => __awaiter(void 0, void 0, void 0, function* () {
+    const academicSemesterQuery = new QueryBuilder_1.default(academicSemester_model_1.AcademicSemester.find(), query)
+        .search(['name'])
+        .paginate()
+        .filter()
+        .sort()
+        .fields();
+    const result = yield academicSemesterQuery.modelQuery;
+    const meta = yield academicSemesterQuery.countTotal();
+    return {
+        result,
+        meta,
+    };
 });
 const getAcademicSemesterByIdFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield academicSemester_model_1.AcademicSemester.findById(id);

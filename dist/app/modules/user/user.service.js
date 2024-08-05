@@ -29,16 +29,24 @@ const user_utils_1 = require("./user.utils");
 const createStudentIntoDB = (password, student, file) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     const admissionSemester = yield academicSemester_model_1.AcademicSemester.findById(student.admissionSemester);
+    if (!admissionSemester) {
+        throw new AppError_1.default(404, 'Admission semester not found');
+    }
+    const academicDepartment = yield academicDepartment_model_1.AcademicDepartment.findById(student.academicDepartment);
+    if (!academicDepartment) {
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, 'Academic department not found');
+    }
+    student.academicFaculty = academicDepartment.academicFaculty;
     const session = yield mongoose_1.default.startSession();
     try {
         session.startTransaction();
-        if (!admissionSemester) {
-            throw new AppError_1.default(404, 'Admission semester not found');
-        }
         const id = yield (0, user_utils_1.generateStudentID)(admissionSemester);
-        const imageName = `${id}-${(_a = student.name) === null || _a === void 0 ? void 0 : _a.firstName}-${(_b = student.name) === null || _b === void 0 ? void 0 : _b.lastName}`;
-        const path = file.path;
-        const profileImg = yield (0, sendImageToCloudnary_1.sendImageToCloudnary)(imageName, path);
+        if (file) {
+            const imageName = `${id}-${(_a = student.name) === null || _a === void 0 ? void 0 : _a.firstName}-${(_b = student.name) === null || _b === void 0 ? void 0 : _b.lastName}`;
+            const path = file.path;
+            const profileImg = yield (0, sendImageToCloudnary_1.sendImageToCloudnary)(imageName, path);
+            student.profileImg = profileImg;
+        }
         const user = {
             password: password || config_1.default.default_password,
             role: 'student',
@@ -52,7 +60,6 @@ const createStudentIntoDB = (password, student, file) => __awaiter(void 0, void 
         }
         student.id = newUser[0].id;
         student.user = newUser[0]._id;
-        student.profileImg = profileImg;
         const newStudent = yield student_model_1.Student.create([student], { session });
         if (!newStudent.length) {
             throw new AppError_1.default(500, 'Error creating student');
@@ -81,6 +88,8 @@ const createFacultyIntoDB = (password, payload, file) => __awaiter(void 0, void 
     if (!academicDepartment) {
         throw new AppError_1.default(400, 'Academic department not found');
     }
+    // set academic faculty
+    payload.academicFaculty = academicDepartment.academicFaculty;
     const session = yield mongoose_1.default.startSession();
     try {
         session.startTransaction();
@@ -94,11 +103,12 @@ const createFacultyIntoDB = (password, payload, file) => __awaiter(void 0, void 
             throw new AppError_1.default(http_status_1.default.BAD_REQUEST, 'Failed to create user');
         }
         // upload image to cloudinary
-        const imageName = `${id}-${(_c = payload.name) === null || _c === void 0 ? void 0 : _c.firstName}-${(_d = payload.name) === null || _d === void 0 ? void 0 : _d.lastName}`;
-        const path = file.path;
-        const profileImg = yield (0, sendImageToCloudnary_1.sendImageToCloudnary)(imageName, path);
-        // set id , _id as user
-        payload.profileImg = profileImg;
+        if (file) {
+            const imageName = `${id}-${(_c = payload.name) === null || _c === void 0 ? void 0 : _c.firstName}-${(_d = payload.name) === null || _d === void 0 ? void 0 : _d.lastName}`;
+            const path = file.path;
+            const profileImg = yield (0, sendImageToCloudnary_1.sendImageToCloudnary)(imageName, path);
+            payload.profileImg = profileImg;
+        }
         payload.id = newUser[0].id;
         payload.user = newUser[0]._id; //reference _id
         // create a faculty (transaction-2)
@@ -137,12 +147,13 @@ const createAdminIntoDB = (password, payload, file) => __awaiter(void 0, void 0,
         if (!newUser.length) {
             throw new AppError_1.default(http_status_1.default.BAD_REQUEST, 'Failed to create admin');
         }
-        // upload image to cloudinary
-        const imageName = `${id}-${(_e = payload.name) === null || _e === void 0 ? void 0 : _e.firstName}-${(_f = payload.name) === null || _f === void 0 ? void 0 : _f.lastName}`;
-        const path = file.path;
-        const profileImg = yield (0, sendImageToCloudnary_1.sendImageToCloudnary)(imageName, path);
-        // set id , _id as user
-        payload.profileImg = profileImg;
+        if (file) {
+            // upload image to cloudinary
+            const imageName = `${id}-${(_e = payload.name) === null || _e === void 0 ? void 0 : _e.firstName}-${(_f = payload.name) === null || _f === void 0 ? void 0 : _f.lastName}`;
+            const path = file.path;
+            const profileImg = yield (0, sendImageToCloudnary_1.sendImageToCloudnary)(imageName, path);
+            payload.profileImg = profileImg;
+        }
         payload.id = newUser[0].id;
         payload.user = newUser[0]._id; //reference _id
         // create a admin (transaction-2)
@@ -175,6 +186,9 @@ const getMeService = (id, role) => __awaiter(void 0, void 0, void 0, function* (
     }
     if (role === 'admin') {
         result = yield admin_model_1.Admin.findOne({ id }).populate('user');
+    }
+    if (role === 'superAdmin') {
+        result = yield user_model_1.User.findOne({ id });
     }
     return result;
 });

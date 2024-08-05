@@ -27,12 +27,13 @@ const createAcademicSemester = (0, catchAsync_1.catchAsync)((req, res) => __awai
     });
 }));
 const getAcademicSemester = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield academicSemester_service_1.academicSemesterService.getAcademicSemesterFromDB();
+    const result = yield academicSemester_service_1.academicSemesterService.getAcademicSemesterFromDB(req.query);
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
         message: 'Academic semester fetched successfully',
-        data: result,
+        meta: result.meta,
+        data: result.result,
     });
 }));
 const getAcademicSemesterById = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {

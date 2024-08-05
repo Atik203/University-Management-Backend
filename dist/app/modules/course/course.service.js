@@ -41,7 +41,11 @@ const getAllCoursesFromDB = (query) => __awaiter(void 0, void 0, void 0, functio
         .fields()
         .search(course_constant_1.CourseSearchAbleFields);
     const result = yield courseQuery.modelQuery;
-    return result;
+    const meta = yield courseQuery.countTotal();
+    return {
+        meta,
+        result,
+    };
 });
 const getSingleCourseFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield course_model_1.Course.findById(id).populate('preRequisiteCourses.course');
@@ -117,6 +121,10 @@ const removeFacultiesFromCourse = (courseId, faculties) => __awaiter(void 0, voi
     const result = yield course_model_1.CourseFaculty.findByIdAndUpdate(courseId, { $pull: { faculties: { $in: faculties } } }, { new: true });
     return result;
 });
+const getCourseFacultiesFromDB = (courseId) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield course_model_1.CourseFaculty.findOne({ course: courseId }).populate('faculties');
+    return result;
+});
 exports.courseService = {
     createCourseIntoDB,
     getSingleCourseFromDB,
@@ -125,4 +133,5 @@ exports.courseService = {
     deleteCourseFromDB,
     assignFacultiesToCourse,
     removeFacultiesFromCourse,
+    getCourseFacultiesFromDB,
 };
