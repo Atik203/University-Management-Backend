@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
 import mongoose from 'mongoose';
+import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../Errors/AppError';
 import { Course } from '../course/course.model';
 import { Faculty } from '../faculty/faculty.model';
@@ -244,9 +245,40 @@ const getSingleEnrolledCourseFromDB = async (id: string) => {
   return result;
 };
 
+const getMyEnrolledCoursesFromDB = async (
+  studentId: string,
+  query: Record<string, unknown>,
+) => {
+  const student = await Student.findOne({ id: studentId });
+
+  if (!student) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Student not found !');
+  }
+
+  const enrolledCourseQuery = new QueryBuilder(
+    EnrolledCourse.find({ student: student._id }).populate(
+      'semesterRegistration academicSemester academicFaculty academicDepartment offeredCourse course student faculty',
+    ),
+    query,
+  )
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await enrolledCourseQuery.modelQuery;
+  const meta = await enrolledCourseQuery.countTotal();
+
+  return {
+    meta,
+    result,
+  };
+};
+
 export const enrolledCourseService = {
   createEnrolledCourseIntoDB,
   updateEnrolledCourseMarksIntoDB,
   getAllEnrolledCoursesFromDB,
   getSingleEnrolledCourseFromDB,
+  getMyEnrolledCoursesFromDB,
 };
