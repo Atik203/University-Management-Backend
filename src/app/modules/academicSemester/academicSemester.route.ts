@@ -9,22 +9,26 @@ const router = express.Router();
 
 router.post(
   '/create-academic-semester',
-  auth(USER_ROLE.admin),
+  auth(USER_ROLE.admin, USER_ROLE.superAdmin),
   validateRequest(academicSemesterValidation.createAcademicSemesterSchema),
   academicSemesterController.createAcademicSemester,
 );
 
-router.get('/', auth('admin'), academicSemesterController.getAcademicSemester);
+router.get(
+  '/',
+  auth(USER_ROLE.admin, USER_ROLE.superAdmin),
+  academicSemesterController.getAcademicSemester,
+);
 
 router.get(
   '/:id',
-  auth('admin'),
+  auth(USER_ROLE.admin, USER_ROLE.superAdmin),
   academicSemesterController.getAcademicSemesterById,
 );
 
 router.patch(
   '/:id',
-  auth(USER_ROLE.admin),
+  auth(USER_ROLE.admin, USER_ROLE.superAdmin),
   validateRequest(academicSemesterValidation.updateAcademicSemesterSchema),
   academicSemesterController.updateAcademicSemester,
 );
