@@ -13,34 +13,42 @@ const router = express.Router();
 
 router.post(
   '/create-course',
-  auth(USER_ROLE.admin),
+  auth(USER_ROLE.admin, USER_ROLE.superAdmin),
   validateRequest(createCourseValidationSchema),
   courseController.createCourse,
 );
 
-router.get('/', courseController.getAllCourses);
+router.get(
+  '/',
+
+  courseController.getAllCourses,
+);
 
 router.get('/:id', courseController.getSingleCourse);
 
 router.patch(
   '/:id',
-  auth(USER_ROLE.admin),
+  auth(USER_ROLE.admin, USER_ROLE.superAdmin),
   validateRequest(updateCourseValidationSchema),
   courseController.updateCourse,
 );
 
-router.delete('/:id', auth(USER_ROLE.admin), courseController.deleteCourse);
+router.delete(
+  '/:id',
+  auth(USER_ROLE.admin, USER_ROLE.superAdmin),
+  courseController.deleteCourse,
+);
 
 router.put(
   '/:courseId/assign-faculties',
-  auth(USER_ROLE.admin),
+  auth(USER_ROLE.admin, USER_ROLE.superAdmin),
   validateRequest(assignFacultiesValidationSchema),
   courseController.assignFaculties,
 );
 
 router.delete(
   '/:courseId/remove-faculties',
-  auth(USER_ROLE.admin),
+  auth(USER_ROLE.admin, USER_ROLE.superAdmin),
   courseController.removeFaculties,
 );
 
