@@ -25,11 +25,12 @@ const createAcademicDepartment = (0, catchAsync_1.catchAsync)((req, res) => __aw
     });
 }));
 const getAcademicDepartment = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield academicDepartment_service_1.academicDepartmentService.getAllAcademicDepartmentFromDB();
+    const result = yield academicDepartment_service_1.academicDepartmentService.getAllAcademicDepartmentFromDB(req.query);
     res.status(http_status_1.default.OK).json({
         status: 'success',
         message: 'Academic Department fetched successfully',
-        data: result,
+        meta: result.meta,
+        data: result.result,
     });
 }));
 const getAcademicDepartmentById = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {

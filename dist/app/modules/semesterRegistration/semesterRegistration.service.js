@@ -49,7 +49,11 @@ const getAllSemesterRegistrationFromDB = (query) => __awaiter(void 0, void 0, vo
         .paginate()
         .fields();
     const result = semesterRegistrationQuery.modelQuery;
-    return result;
+    const meta = semesterRegistrationQuery.countTotal();
+    return {
+        result,
+        meta,
+    };
 });
 const getSingleSemesterRegistrationFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = semesterRegistration_model_1.SemesterRegistration.findById(id);

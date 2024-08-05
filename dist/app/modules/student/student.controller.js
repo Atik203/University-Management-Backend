@@ -33,7 +33,8 @@ const getAllStudents = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void
         statusCode: http_status_1.default.OK,
         success: true,
         message: 'Student are retrieved successfully',
-        data: result,
+        meta: result.meta,
+        data: result.result,
     });
 }));
 const deleteStudent = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {

@@ -25,11 +25,12 @@ const createAcademicFaculty = (0, catchAsync_1.catchAsync)((req, res) => __await
     });
 }));
 const getAcademicFaculty = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield academicFaculty_service_1.academicFacultyService.getAllAcademicFacultyFromDB();
+    const result = yield academicFaculty_service_1.academicFacultyService.getAllAcademicFacultyFromDB(req.query);
     res.status(http_status_1.default.OK).json({
         status: 'success',
         message: 'Academic faculty fetched successfully',
-        data: result,
+        meta: result.meta,
+        data: result.result,
     });
 }));
 const getAcademicFacultyById = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {

@@ -10,4 +10,5 @@ exports.searchAbleFields = [
     'guardian.fatherName',
     'guardian.motherName',
     'localGuardian.name',
+    'email',
 ];

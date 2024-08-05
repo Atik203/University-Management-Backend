@@ -32,7 +32,8 @@ const getAllOfferedCourses = (0, catchAsync_1.catchAsync)((req, res) => __awaite
         statusCode: http_status_1.default.OK,
         success: true,
         message: 'OfferedCourses retrieved successfully !',
-        data: result,
+        meta: result.meta,
+        data: result.result,
     });
 }));
 const getSingleOfferedCourses = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -65,10 +66,21 @@ const deleteOfferedCourseFromDB = (0, catchAsync_1.catchAsync)((req, res) => __a
         data: result,
     });
 }));
+const getMyOfferedCourses = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield offeredCourse_service_1.OfferedCourseServices.getMyOfferedCoursesFromDb(req.user.id, req.query);
+    (0, sendResponse_1.sendResponse)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: 'My OfferedCourses retrieved successfully !',
+        meta: result.meta,
+        data: result.result,
+    });
+}));
 exports.OfferedCourseControllers = {
     createOfferedCourse,
     getAllOfferedCourses,
     getSingleOfferedCourses,
     updateOfferedCourse,
     deleteOfferedCourseFromDB,
+    getMyOfferedCourses,
 };

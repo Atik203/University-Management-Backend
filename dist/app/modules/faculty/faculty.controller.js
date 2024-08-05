@@ -33,7 +33,8 @@ const getAllFaculties = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(voi
         statusCode: http_status_1.default.OK,
         success: true,
         message: 'Faculties are retrieved successfully',
-        data: result,
+        meta: result.meta,
+        data: result.result,
     });
 }));
 const updateFaculty = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {

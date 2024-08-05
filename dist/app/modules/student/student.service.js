@@ -34,21 +34,18 @@ const user_model_1 = require("../user/user.model");
 const student_constant_1 = require("./student.constant");
 const student_model_1 = require("./student.model");
 const getAllStudentsFromDB = (query) => __awaiter(void 0, void 0, void 0, function* () {
-    const studentQuery = new QueryBuilder_1.default(student_model_1.Student.find()
-        .populate({
-        path: 'academicDepartment',
-        populate: {
-            path: 'academicFaculty',
-        },
-    })
-        .populate('admissionSemester'), query)
+    const studentQuery = new QueryBuilder_1.default(student_model_1.Student.find().populate('academicDepartment academicFaculty admissionSemester'), query)
         .search(student_constant_1.searchAbleFields)
         .filter()
         .sort()
         .paginate()
         .fields();
     const result = yield studentQuery.modelQuery;
-    return result;
+    const meta = yield studentQuery.countTotal();
+    return {
+        meta,
+        result,
+    };
 });
 const getSingleStudentFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield student_model_1.Student.findById(id)

@@ -33,7 +33,8 @@ const getAllAdmins = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0
         statusCode: http_status_1.default.OK,
         success: true,
         message: 'Admins are retrieved successfully',
-        data: result,
+        meta: result.meta,
+        data: result.result,
     });
 }));
 const updateAdmin = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {

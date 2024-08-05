@@ -41,7 +41,7 @@ exports.userSchema = new mongoose_1.Schema({
     },
     role: {
         type: String,
-        enum: ['admin', 'student', 'faculty'],
+        enum: ['admin', 'student', 'faculty', 'superAdmin'],
     },
     status: {
         type: String,
