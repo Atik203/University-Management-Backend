@@ -7,4 +7,5 @@ export const searchAbleFields = [
   'guardian.fatherName',
   'guardian.motherName',
   'localGuardian.name',
+  'email',
 ];
