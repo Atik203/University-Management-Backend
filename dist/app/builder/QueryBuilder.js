@@ -72,9 +72,9 @@ class QueryBuilder {
             const limit = ((_b = this.query) === null || _b === void 0 ? void 0 : _b.limit) ? parseInt(this.query.limit) : 10;
             const totalPage = Math.ceil(total / limit);
             return {
-                total,
                 page,
                 limit,
+                total,
                 totalPage,
             };
         });
