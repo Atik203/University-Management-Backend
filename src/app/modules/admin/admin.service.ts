@@ -35,11 +35,21 @@ const updateAdminIntoDB = async (
   payload: Partial<TAdmin>,
   file: any,
 ) => {
+  const admin = await Admin.findOne({ id });
+
+  if (!admin) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Admin not found');
+  }
+
   const { name, ...remainingAdminData } = payload;
 
-  const imageName = `${id}-${name?.firstName}-${name?.lastName}`;
-  const path = file.path;
-  const profileImg = await sendImageToCloudnary(imageName, path);
+  let profileImg = admin.profileImg;
+
+  if (file) {
+    const imageName = `${id}-${name?.firstName}-${name?.lastName}`;
+    const path = file.path;
+    profileImg = await sendImageToCloudnary(imageName, path);
+  }
 
   const modifiedUpdatedData: Record<string, unknown> = {
     ...remainingAdminData,
@@ -52,7 +62,7 @@ const updateAdminIntoDB = async (
     }
   }
 
-  const result = await Admin.findByIdAndUpdate({ id }, modifiedUpdatedData, {
+  const result = await Admin.findByIdAndUpdate(admin._id, modifiedUpdatedData, {
     new: true,
     runValidators: true,
   });
