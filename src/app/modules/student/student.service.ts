@@ -114,10 +114,13 @@ const updateStudentInDB = async (
 
   const { name, guardian, localGuardian, ...remaining } = updateData;
 
-  const imageName = `${id}-${name?.firstName}-${name?.lastName}`;
-  const path = file.path;
+  let profileImg = student.profileImg;
+  if (file) {
+    const imageName = `${id}-${name?.firstName}-${name?.lastName}`;
+    const path = file.path;
 
-  const profileImg = await sendImageToCloudnary(imageName, path);
+    profileImg = await sendImageToCloudnary(imageName, path);
+  }
 
   const modifiedData: Record<string, unknown> = {
     ...remaining,
@@ -141,10 +144,14 @@ const updateStudentInDB = async (
     }
   }
 
-  const updatedStudent = await Student.findByIdAndUpdate(id, modifiedData, {
-    new: true,
-    runValidators: true,
-  });
+  const updatedStudent = await Student.findByIdAndUpdate(
+    student._id,
+    modifiedData,
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
 
   return updatedStudent;
 };
