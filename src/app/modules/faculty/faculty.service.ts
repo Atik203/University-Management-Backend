@@ -41,12 +41,23 @@ const updateFacultyIntoDB = async (
   payload: Partial<TFaculty>,
   file: any,
 ) => {
+  // is faculty exists
+
+  const faculty = await Faculty.findOne({ id });
+
+  if (!faculty) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Faculty not found');
+  }
+
   const { name, ...remainingFacultyData } = payload;
 
-  const imageName = `${id}-${name?.firstName}-${name?.lastName}`;
-  const path = file.path;
-  const profileImg = await sendImageToCloudnary(imageName, path);
+  let profileImg = faculty.profileImg;
 
+  if (file) {
+    const imageName = `${id}-${name?.firstName}-${name?.lastName}`;
+    const path = file.path;
+    profileImg = await sendImageToCloudnary(imageName, path);
+  }
   const modifiedUpdatedData: Record<string, unknown> = {
     ...remainingFacultyData,
     profileImg,
@@ -58,10 +69,14 @@ const updateFacultyIntoDB = async (
     }
   }
 
-  const result = await Faculty.findByIdAndUpdate(id, modifiedUpdatedData, {
-    new: true,
-    runValidators: true,
-  });
+  const result = await Faculty.findByIdAndUpdate(
+    faculty._id,
+    modifiedUpdatedData,
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
   return result;
 };
 
