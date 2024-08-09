@@ -34,7 +34,7 @@ const user_model_1 = require("../user/user.model");
 const faculty_constant_1 = require("./faculty.constant");
 const faculty_model_1 = require("./faculty.model");
 const getAllFacultiesFromDB = (query) => __awaiter(void 0, void 0, void 0, function* () {
-    const facultyQuery = new QueryBuilder_1.default(faculty_model_1.Faculty.find().populate('academicDepartment academicFaculty'), query)
+    const facultyQuery = new QueryBuilder_1.default(faculty_model_1.Faculty.find().populate('academicDepartment academicFaculty user'), query)
         .search(faculty_constant_1.FacultySearchableFields)
         .filter()
         .sort()
@@ -52,17 +52,25 @@ const getSingleFacultyFromDB = (id) => __awaiter(void 0, void 0, void 0, functio
     return result;
 });
 const updateFacultyIntoDB = (id, payload, file) => __awaiter(void 0, void 0, void 0, function* () {
+    // is faculty exists
+    const faculty = yield faculty_model_1.Faculty.findOne({ id });
+    if (!faculty) {
+        throw new AppError_1.default(http_status_1.default.BAD_REQUEST, 'Faculty not found');
+    }
     const { name } = payload, remainingFacultyData = __rest(payload, ["name"]);
-    const imageName = `${id}-${name === null || name === void 0 ? void 0 : name.firstName}-${name === null || name === void 0 ? void 0 : name.lastName}`;
-    const path = file.path;
-    const profileImg = yield (0, sendImageToCloudnary_1.sendImageToCloudnary)(imageName, path);
+    let profileImg = faculty.profileImg;
+    if (file) {
+        const imageName = `${id}-${name === null || name === void 0 ? void 0 : name.firstName}-${name === null || name === void 0 ? void 0 : name.lastName}`;
+        const path = file.path;
+        profileImg = yield (0, sendImageToCloudnary_1.sendImageToCloudnary)(imageName, path);
+    }
     const modifiedUpdatedData = Object.assign(Object.assign({}, remainingFacultyData), { profileImg });
     if (name && Object.keys(name).length) {
         for (const [key, value] of Object.entries(name)) {
             modifiedUpdatedData[`name.${key}`] = value;
         }
     }
-    const result = yield faculty_model_1.Faculty.findByIdAndUpdate(id, modifiedUpdatedData, {
+    const result = yield faculty_model_1.Faculty.findByIdAndUpdate(faculty._id, modifiedUpdatedData, {
         new: true,
         runValidators: true,
     });

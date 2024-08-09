@@ -34,7 +34,7 @@ const user_model_1 = require("../user/user.model");
 const student_constant_1 = require("./student.constant");
 const student_model_1 = require("./student.model");
 const getAllStudentsFromDB = (query) => __awaiter(void 0, void 0, void 0, function* () {
-    const studentQuery = new QueryBuilder_1.default(student_model_1.Student.find().populate('academicDepartment academicFaculty admissionSemester'), query)
+    const studentQuery = new QueryBuilder_1.default(student_model_1.Student.find().populate('academicDepartment academicFaculty admissionSemester user'), query)
         .search(student_constant_1.searchAbleFields)
         .filter()
         .sort()
@@ -91,9 +91,12 @@ const updateStudentInDB = (id, updateData, file) => __awaiter(void 0, void 0, vo
         throw new AppError_1.default(http_status_1.default.BAD_REQUEST, 'Student not found and failed to update');
     }
     const { name, guardian, localGuardian } = updateData, remaining = __rest(updateData, ["name", "guardian", "localGuardian"]);
-    const imageName = `${id}-${name === null || name === void 0 ? void 0 : name.firstName}-${name === null || name === void 0 ? void 0 : name.lastName}`;
-    const path = file.path;
-    const profileImg = yield (0, sendImageToCloudnary_1.sendImageToCloudnary)(imageName, path);
+    let profileImg = student.profileImg;
+    if (file) {
+        const imageName = `${id}-${name === null || name === void 0 ? void 0 : name.firstName}-${name === null || name === void 0 ? void 0 : name.lastName}`;
+        const path = file.path;
+        profileImg = yield (0, sendImageToCloudnary_1.sendImageToCloudnary)(imageName, path);
+    }
     const modifiedData = Object.assign(Object.assign({}, remaining), { profileImg });
     if (name && Object.keys(name).length) {
         for (const [key, value] of Object.entries(name)) {
@@ -110,7 +113,7 @@ const updateStudentInDB = (id, updateData, file) => __awaiter(void 0, void 0, vo
             modifiedData[`localGuardian.${key}`] = value;
         }
     }
-    const updatedStudent = yield student_model_1.Student.findByIdAndUpdate(id, modifiedData, {
+    const updatedStudent = yield student_model_1.Student.findByIdAndUpdate(student._id, modifiedData, {
         new: true,
         runValidators: true,
     });

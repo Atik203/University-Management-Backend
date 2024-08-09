@@ -34,7 +34,7 @@ const user_model_1 = require("../user/user.model");
 const admin_constant_1 = require("./admin.constant");
 const admin_model_1 = require("./admin.model");
 const getAllAdminsFromDB = (query) => __awaiter(void 0, void 0, void 0, function* () {
-    const adminQuery = new QueryBuilder_1.default(admin_model_1.Admin.find(), query)
+    const adminQuery = new QueryBuilder_1.default(admin_model_1.Admin.find().populate('user'), query)
         .search(admin_constant_1.AdminSearchableFields)
         .filter()
         .sort()
@@ -52,17 +52,24 @@ const getSingleAdminFromDB = (id) => __awaiter(void 0, void 0, void 0, function*
     return result;
 });
 const updateAdminIntoDB = (id, payload, file) => __awaiter(void 0, void 0, void 0, function* () {
+    const admin = yield admin_model_1.Admin.findOne({ id });
+    if (!admin) {
+        throw new AppError_1.default(http_status_1.default.BAD_REQUEST, 'Admin not found');
+    }
     const { name } = payload, remainingAdminData = __rest(payload, ["name"]);
-    const imageName = `${id}-${name === null || name === void 0 ? void 0 : name.firstName}-${name === null || name === void 0 ? void 0 : name.lastName}`;
-    const path = file.path;
-    const profileImg = yield (0, sendImageToCloudnary_1.sendImageToCloudnary)(imageName, path);
+    let profileImg = admin.profileImg;
+    if (file) {
+        const imageName = `${id}-${name === null || name === void 0 ? void 0 : name.firstName}-${name === null || name === void 0 ? void 0 : name.lastName}`;
+        const path = file.path;
+        profileImg = yield (0, sendImageToCloudnary_1.sendImageToCloudnary)(imageName, path);
+    }
     const modifiedUpdatedData = Object.assign(Object.assign({}, remainingAdminData), { profileImg });
     if (name && Object.keys(name).length) {
         for (const [key, value] of Object.entries(name)) {
             modifiedUpdatedData[`name.${key}`] = value;
         }
     }
-    const result = yield admin_model_1.Admin.findByIdAndUpdate({ id }, modifiedUpdatedData, {
+    const result = yield admin_model_1.Admin.findByIdAndUpdate(admin._id, modifiedUpdatedData, {
         new: true,
         runValidators: true,
     });
@@ -74,7 +81,7 @@ const deleteAdminFromDB = (id) => __awaiter(void 0, void 0, void 0, function* ()
         session.startTransaction();
         const deletedAdmin = yield admin_model_1.Admin.findByIdAndUpdate(id, { isDeleted: true }, { new: true, session });
         if (!deletedAdmin) {
-            throw new AppError_1.default(http_status_1.default.BAD_REQUEST, 'Failed to delete student');
+            throw new AppError_1.default(http_status_1.default.BAD_REQUEST, 'Failed to delete admin');
         }
         // get user _id from deletedAdmin
         const userId = deletedAdmin.user;
