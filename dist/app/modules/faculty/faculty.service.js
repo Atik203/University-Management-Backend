@@ -48,7 +48,7 @@ const getAllFacultiesFromDB = (query) => __awaiter(void 0, void 0, void 0, funct
     };
 });
 const getSingleFacultyFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield faculty_model_1.Faculty.findById(id).populate('academicDepartment');
+    const result = yield faculty_model_1.Faculty.findById(id).populate('academicDepartment academicFaculty user');
     return result;
 });
 const updateFacultyIntoDB = (id, payload, file) => __awaiter(void 0, void 0, void 0, function* () {
