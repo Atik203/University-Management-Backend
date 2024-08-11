@@ -31,7 +31,9 @@ const getAllFacultiesFromDB = async (query: Record<string, unknown>) => {
 };
 
 const getSingleFacultyFromDB = async (id: string) => {
-  const result = await Faculty.findById(id).populate('academicDepartment');
+  const result = await Faculty.findById(id).populate(
+    'academicDepartment academicFaculty user',
+  );
 
   return result;
 };
