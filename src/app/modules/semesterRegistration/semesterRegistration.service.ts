@@ -79,9 +79,7 @@ const updateSemesterRegistrationIntoDB = async (
   payload: Partial<TSemesterRegistration>,
 ) => {
   // Check if the semester registration already exists
-  const isAcademicSemesterExist = await SemesterRegistration.findById(
-    payload.academicSemester,
-  );
+  const isAcademicSemesterExist = await SemesterRegistration.findById(id);
   if (!isAcademicSemesterExist) {
     throw new AppError(
       httpStatus.NOT_FOUND,
