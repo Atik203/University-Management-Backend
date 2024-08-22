@@ -155,7 +155,9 @@ const getAllOfferedCoursesFromDB = async (query: Record<string, unknown>) => {
 };
 
 const getSingleOfferedCourseFromDB = async (id: string) => {
-  const offeredCourse = await OfferedCourse.findById(id);
+  const offeredCourse = await OfferedCourse.findById(id).populate(
+    'semesterRegistration academicSemester course faculty academicDepartment academicFaculty',
+  );
 
   if (!offeredCourse) {
     throw new AppError(404, 'Offered Course not found');
