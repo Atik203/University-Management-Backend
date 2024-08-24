@@ -239,7 +239,7 @@ const getAllEnrolledCoursesFromDB = async (
     try {
       const enrolledCourseQuery = new QueryBuilder(
         EnrolledCourse.find({ faculty: faculty._id }).populate(
-          'semesterRegistration offeredCourse course student faculty',
+          'semesterRegistration offeredCourse course student faculty academicSemester academicFaculty academicDepartment',
         ),
         query,
       )
@@ -266,7 +266,7 @@ const getAllEnrolledCoursesFromDB = async (
     try {
       const enrolledCourseQuery = new QueryBuilder(
         EnrolledCourse.find().populate(
-          'semesterRegistration offeredCourse course student faculty',
+          'semesterRegistration offeredCourse course student faculty academicSemester academicFaculty academicDepartment',
         ),
         query,
       )
