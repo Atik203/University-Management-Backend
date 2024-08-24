@@ -32,7 +32,12 @@ router.patch(
 
 router.get(
   '/',
-  auth(USER_ROLE.admin, USER_ROLE.superAdmin, USER_ROLE.student),
+  auth(
+    USER_ROLE.admin,
+    USER_ROLE.superAdmin,
+    USER_ROLE.student,
+    USER_ROLE.faculty,
+  ),
   enrolledCourseController.getAllEnrolledCourses,
 );
 

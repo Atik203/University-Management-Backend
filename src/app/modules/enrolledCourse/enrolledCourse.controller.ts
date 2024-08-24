@@ -33,6 +33,10 @@ const updateEnrolledCourse = catchAsync(async (req, res) => {
 const getAllEnrolledCourses = catchAsync(async (req, res) => {
   const result = await enrolledCourseService.getAllEnrolledCoursesFromDB(
     req.query,
+    {
+      id: req.user.id,
+      role: req.user.role,
+    },
   );
   sendResponse(res, {
     success: true,

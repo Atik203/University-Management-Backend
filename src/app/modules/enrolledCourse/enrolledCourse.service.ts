@@ -223,25 +223,73 @@ const updateEnrolledCourseMarksIntoDB = async (
   return result;
 };
 
-const getAllEnrolledCoursesFromDB = async (query: Record<string, unknown>) => {
-  const enrolledCourseQuery = new QueryBuilder(
-    EnrolledCourse.find().populate(
-      'semesterRegistration offeredCourse course student faculty',
-    ),
-    query,
-  )
-    .filter()
-    .sort()
-    .paginate()
-    .fields();
+const getAllEnrolledCoursesFromDB = async (
+  query: Record<string, unknown>,
+  user: {
+    id: string;
+    role: string;
+  },
+) => {
+  if (user.role === 'faculty') {
+    const faculty = await Faculty.findOne({ id: user.id });
+    if (!faculty) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Faculty not found!');
+    }
 
-  const result = await enrolledCourseQuery.modelQuery;
-  const meta = await enrolledCourseQuery.countTotal();
+    try {
+      const enrolledCourseQuery = new QueryBuilder(
+        EnrolledCourse.find({ faculty: faculty._id }).populate(
+          'semesterRegistration offeredCourse course student faculty',
+        ),
+        query,
+      )
+        .filter()
+        .sort()
+        .paginate()
+        .fields();
 
-  return {
-    meta,
-    result,
-  };
+      const result = await enrolledCourseQuery.modelQuery;
+      const meta = await enrolledCourseQuery.countTotal();
+
+      return {
+        meta,
+        result,
+      };
+    } catch (error) {
+      console.error('Error fetching enrolled courses for faculty:', error);
+      throw new AppError(
+        httpStatus.INTERNAL_SERVER_ERROR,
+        'Error fetching enrolled courses',
+      );
+    }
+  } else {
+    try {
+      const enrolledCourseQuery = new QueryBuilder(
+        EnrolledCourse.find().populate(
+          'semesterRegistration offeredCourse course student faculty',
+        ),
+        query,
+      )
+        .filter()
+        .sort()
+        .paginate()
+        .fields();
+
+      const result = await enrolledCourseQuery.modelQuery;
+      const meta = await enrolledCourseQuery.countTotal();
+
+      return {
+        meta,
+        result,
+      };
+    } catch (error) {
+      console.error('Error fetching enrolled courses:', error);
+      throw new AppError(
+        httpStatus.INTERNAL_SERVER_ERROR,
+        'Error fetching enrolled courses',
+      );
+    }
+  }
 };
 
 const getSingleEnrolledCourseFromDB = async (id: string) => {
